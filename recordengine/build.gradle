@@ -5,10 +5,10 @@ properties.load(project.rootProject.file('local.properties').newDataInputStream(
 def superpowered_sdk_path = properties.getProperty('superpowered.dir')
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 3
         versionName "RecordEngine v3.0"
 

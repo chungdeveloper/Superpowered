@@ -1,4 +1,4 @@
-//
+#include <stdint.h>//
 // Created by shoot on 2018-01-10.
 //
 
@@ -57,7 +57,7 @@ public:
 
     void enableEffect(bool enable);
 
-    void onSampleRecordListener(short *data, int sampleSize);
+    void __unused onSampleRecordListener(short *data, int sampleSize);
 
     ~RecordEngine();
 

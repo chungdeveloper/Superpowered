@@ -34,7 +34,7 @@ bool RecordEngine::process(short int *audioInputOutput, unsigned int numberOfSam
     return true;
 }
 
-void RecordEngine::onSampleRecordListener(short *data, int sampleSize) {
+void __unused RecordEngine::onSampleRecordListener(short *data, int sampleSize) {
     javaVM->AttachCurrentThread(&jniEnv, NULL);
     samples = jniEnv->NewShortArray(sampleSize);
     (jniEnv)->SetShortArrayRegion(samples, 0, sampleSize, data);
@@ -82,7 +82,7 @@ RecordEngine::RecordEngine(JNIEnv *env, jobject instance, const char *path, int 
                                                  audioProcessing, this,
                                                  SL_ANDROID_RECORDING_PRESET_VOICE_RECOGNITION/*-1*/,
                                                  SL_ANDROID_STREAM_MEDIA,
-                                                 bufferSize);
+                                                 bufferSize * 2);
     (jniEnv)->CallVoidMethod(jObject, onInitDoneMethodID, 10);
 }
 
