@@ -30,7 +30,7 @@ bool RecordEngine::process(short int *audioInputOutput, unsigned int numberOfSam
     threeBandEQ->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
     nBandEQ->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
     SuperpoweredFloatToShortInt(inputBufferFloat, audioInputOutput, numberOfSamples);
-    onSampleRecordListener(audioInputOutput, numberOfSamples);
+//    onSampleRecordListener(audioInputOutput, numberOfSamples);
     return true;
 }
 
