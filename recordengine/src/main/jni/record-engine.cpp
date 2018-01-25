@@ -83,7 +83,7 @@ RecordEngine::RecordEngine(JNIEnv *env, jobject instance, const char *path, int 
                                                  SL_ANDROID_RECORDING_PRESET_VOICE_RECOGNITION/*-1*/,
                                                  SL_ANDROID_STREAM_MEDIA,
                                                  bufferSize * 2);
-    (jniEnv)->CallVoidMethod(jObject, onInitDoneMethodID, 10);
+    (jniEnv)->CallVoidMethod(jObject, onInitDoneMethodID);
 }
 
 #pragma clang diagnostic pop
@@ -132,16 +132,16 @@ RecordEngine::~RecordEngine() {
     delete threeBandEQ;
     delete compressor;
     delete nBandEQ;
-    delete audioSystem;
-    delete jniEnv;
-    delete jObject;
 //    delete onInitDoneMethodID;
-    delete targetClass;
+//    delete targetClass;
     free(recordBufferFloat);
     free(inputBufferFloat);
     free(samples);
     delete pathRecord;
-    delete eqBandList;
+//    delete eqBandList;
+    delete audioSystem;
+//    delete jniEnv;
+//    delete jObject;
 }
 
 void RecordEngine::startRecord() {
@@ -357,5 +357,17 @@ Java_vn_soft_dc_recordengine_RecorderEngine_startRecordFilePath(JNIEnv *env, job
     const char *pathTarget = env->GetStringUTFChars(pathTarget_, 0);
     executeProcess->startRecordPath(pathTarget);
     env->ReleaseStringUTFChars(pathTarget_, pathTarget);
+}
+#pragma clang diagnostic pop
+
+extern "C"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+JNIEXPORT void
+Java_vn_soft_dc_recordengine_RecorderEngine_release(JNIEnv *env, jobject instance) {
+    if (executeProcess == NULL)
+        return;
+    executeProcess->~RecordEngine();
+    executeProcess = NULL;
 }
 #pragma clang diagnostic pop

@@ -37,6 +37,13 @@ public class RecorderEngine {
     }
 
     @SuppressWarnings("unused")
+    public RecorderEngine(int sampleRate, int bufferSize, OnRecordEventListener onRecordEventListener) {
+        mAudioCalculator = new AudioCalculator();
+        this.onRecordEventListener = onRecordEventListener;
+        FrequencyDomainWithRecorder(Environment.getExternalStorageDirectory() + "/record/" + System.currentTimeMillis() + ".wav", sampleRate, bufferSize);
+    }
+
+    @SuppressWarnings("unused")
     public void setThresholdAmp(int thresholdAmp) {
         this.thresholdAmp = thresholdAmp;
     }
@@ -61,6 +68,7 @@ public class RecorderEngine {
     public void stopRecord() {
         stopRecordFile();
     }
+
 
     public void changeEffect(Preset preset) {
         onFxReverbValue(REVERB_DRY, preset.getDryReverb());
@@ -108,33 +116,35 @@ public class RecorderEngine {
         this.onRecordEventListener = onRecordEventListener;
     }
 
-    private native void enableEffect(boolean enable);
+    public native void enableEffect(boolean enable);
 
-    private native void FrequencyDomainWithRecorder(String path, int sampleRate, int bufferSize);
-
-    @SuppressWarnings("unused")
-    private native void startRecordFile();
-
-    private native void startRecordFilePath(String pathTarget);
+    public native void FrequencyDomainWithRecorder(String path, int sampleRate, int bufferSize);
 
     @SuppressWarnings("unused")
-    private native void startRecordWithOffset(int offset);
+    public native void startRecordFile();
 
-    private native void stopRecordFile();
+    public native void startRecordFilePath(String pathTarget);
 
-    private native void setEchoValue(float dry, float wet, float bpm, float beats, float decay, float mix);
+    @SuppressWarnings("unused")
+    public native void startRecordWithOffset(int offset);
 
-    private native void onProcessBandEQ(float value0, float value1, float value2, float value3,
-                                        float value4, float value5, float value6, float value7,
-                                        float value8, float value9);
+    public native void stopRecordFile();
 
-    private native void onBandValues(float low, float mid, float high);
+    public native void setEchoValue(float dry, float wet, float bpm, float beats, float decay, float mix);
 
-    private native void onCompressorValue(float dryWetPercent, float ratio, float attack, float release,
-                                          float threshold, float hpCutOffHz);
+    public native void onProcessBandEQ(float value0, float value1, float value2, float value3,
+                                       float value4, float value5, float value6, float value7,
+                                       float value8, float value9);
+
+    public native void onBandValues(float low, float mid, float high);
+
+    public native void onCompressorValue(float dryWetPercent, float ratio, float attack, float release,
+                                         float threshold, float hpCutOffHz);
 
     @SuppressWarnings("SpellCheckingInspection")
-    private native void onFxReverbValue(int param, float scaleValue);
+    public native void onFxReverbValue(int param, float scaleValue);
+
+    public native void release();
 
     static {
         System.loadLibrary(LIB_CPP);
