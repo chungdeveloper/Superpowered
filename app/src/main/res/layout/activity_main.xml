@@ -34,6 +34,18 @@
             android:text="Stop" />
 
         <Button
+            android:id="@+id/btnInit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Initialization" />
+
+        <Button
+            android:id="@+id/btnRelease"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Release" />
+
+        <Button
             android:id="@+id/btnEnable"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

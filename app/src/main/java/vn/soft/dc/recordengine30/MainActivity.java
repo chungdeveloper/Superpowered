@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         claimPermission();
     }
 
-    @OnClick({R.id.btnStart, R.id.btnStop, R.id.btnEnable, R.id.btnAcoustic, R.id.btnBolero, R.id.btnMaster, R.id.btnPopStar, R.id.btnPopStarFix, R.id.btnRap, R.id.btnStudio})
+    @OnClick({R.id.btnStart, R.id.btnStop, R.id.btnEnable, R.id.btnAcoustic, R.id.btnBolero, R.id.btnMaster, R.id.btnPopStar, R.id.btnPopStarFix, R.id.btnRap, R.id.btnStudio, R.id.btnRelease, R.id.btnInit})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btnStart:
@@ -105,6 +105,14 @@ public class MainActivity extends AppCompatActivity {
             case R.id.btnStudio:
                 mRecorderEngine.changeEffect(mPresets.get(6));
                 break;
+            case R.id.btnRelease:
+                Log.d("RecordEngine", "start release: " + System.currentTimeMillis());
+                mRecorderEngine.release();
+                Log.d("RecordEngine", "end release: " + System.currentTimeMillis());
+                break;
+            case R.id.btnInit:
+                claimPermission();
+                break;
         }
     }
 
@@ -137,8 +145,7 @@ public class MainActivity extends AppCompatActivity {
         if (buffersizeString == null) buffersizeString = "512";
 
         Log.d("ChungLD", buffersizeString);
-        mRecorderEngine = new RecorderEngine(Integer.parseInt(samplerateString), Integer.parseInt(buffersizeString));
-        mRecorderEngine.setOnRecordEventListener(onRecordEventListener);
+        mRecorderEngine = new RecorderEngine(Integer.parseInt(samplerateString), Integer.parseInt(buffersizeString), onRecordEventListener);
         isEnable = false;
         btnEnable.setText(isEnable ? "Đang hoạt động" : "Đã vô hiệu hóa");
     }
