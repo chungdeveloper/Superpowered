@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 isEnable = !isEnable;
                 mRecorderEngine.enableEffectVocal(isEnable);
                 btnEnable.setText(isEnable ? "Đang hoạt động" : "Không hoạt động");
+                mRecorderEngine.enablePlayback(isEnable);
                 break;
             case R.id.btnAcoustic:
                 mRecorderEngine.changeEffect(mPresets.get(0));

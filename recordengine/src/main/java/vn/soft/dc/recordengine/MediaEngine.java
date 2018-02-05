@@ -36,7 +36,7 @@ public class MediaEngine {
     private Uri beatURI;
 
     static {
-//        System.loadLibrary(LIB_MEDIA);
+        System.loadLibrary(LIB_MEDIA);
     }
 
     private boolean isPlaying;
@@ -44,7 +44,6 @@ public class MediaEngine {
     public MediaEngine(Context context) {
         this.mContext = context;
         isPlaying = false;
-        System.loadLibrary(LIB_MEDIA);
     }
 
     @SuppressWarnings("unused")
@@ -152,53 +151,64 @@ public class MediaEngine {
         onVolumeVoice(vol);
     }
 
-    private native void SuperpoweredProcessDouble(int samplerate, int bufferSize, String pathVoice, String pathBeat, int fileAoffset, int fileAlength, int fileBoffset, int fileBlength);
+    public native void SuperpoweredProcessDouble(int samplerate, int bufferSize, String pathVoice, String pathBeat, int fileAoffset, int fileAlength, int fileBoffset, int fileBlength);
 
-    private native void onPlayPause(boolean play);
-
-    @SuppressWarnings("unused")
-    private native void onLimiterOpenClose(boolean state);
+    public native void onPlayPause(boolean play);
 
     @SuppressWarnings("unused")
-    private native void onCrossfader(int value);
+    public native void onLimiterOpenClose(boolean state);
 
     @SuppressWarnings("unused")
-    private native void onFxSelect(int value);
+    public native void onCrossfader(int value);
 
     @SuppressWarnings("unused")
-    private native void onSeekTime(double v);
+    public native void onFxSelect(int value);
 
     @SuppressWarnings("unused")
-    private native double onGetPosition();
+    public native void onSeekTime(double v);
 
     @SuppressWarnings("unused")
-    private native double onGetTotalDuration();
+    public native double onGetPosition();
 
     @SuppressWarnings("unused")
-    private native void onCompressEnable(boolean isEnable);
-
-    private native void onCompressorValue(float dryWetPercent, float ratio, float attack, float release, float threshold, float hpCutOffHz);
+    public native double onGetTotalDuration();
 
     @SuppressWarnings("unused")
-    private native void onFxValue(int value);
+    public native void onCompressEnable(boolean isEnable);
 
-    private native void onPitchShift(int value);
-
-    private native void onEchoValue(float dry, float wet, float bpm, float beats, float decay, float mix);
-
-    private native void onBandValues(float low, float mid, float hi);
-
-    private native void onFxReverbValue(int reverb_type, float value);
+    public native void onCompressorValue(float dryWetPercent, float ratio, float attack, float release, float threshold, float hpCutOffHz);
 
     @SuppressWarnings("unused")
-    private native void onReset();
+    public native void onFxValue(int value);
 
-    private native void onVolumeVoice(int value);
+    public native void onPitchShift(int value);
 
-    private native void onVolumeBeat(int value);
+    public native void onEchoValue(float dry, float wet, float bpm, float beats, float decay, float mix);
+
+    public native void onBandValues(float low, float mid, float hi);
+
+    public native void onFxReverbValue(int reverb_type, float value);
+
+    @SuppressWarnings("unused")
+    public native void onReset();
+
+    public native void onVolumeVoice(int value);
+
+    public native void onVolumeBeat(int value);
 
 
-    private native void onProcessBandEQ(float value0, float value1, float value2, float value3,
-                                        float value4, float value5, float value6, float value7,
-                                        float value8, float value9);
+    public native void onProcessBandEQ(float value0, float value1, float value2, float value3,
+                                       float value4, float value5, float value6, float value7,
+                                       float value8, float value9);
+
+
+    public void onMusicCompletion() {
+    }
+
+    public void onMusicStart() {
+    }
+
+    public void callbackFromC() {
+    }
+
 }

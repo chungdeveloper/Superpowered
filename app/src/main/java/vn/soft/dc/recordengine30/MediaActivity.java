@@ -34,7 +34,7 @@ public class MediaActivity extends AppCompatActivity {
             buffersizeString = audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
         }
 
-        mMediaEngine.setAudioFormat(44100, Integer.parseInt(buffersizeString))
+        mMediaEngine.setAudioFormat(44100, 2048 /*Integer.parseInt(buffersizeString)*/)
                 .setResource(beat, vocal)
                 .build();
     }

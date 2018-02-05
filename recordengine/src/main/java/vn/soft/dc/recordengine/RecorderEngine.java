@@ -144,6 +144,8 @@ public class RecorderEngine {
     @SuppressWarnings("SpellCheckingInspection")
     public native void onFxReverbValue(int param, float scaleValue);
 
+    public native void enablePlayback(boolean enable);
+
     public native void release();
 
     static {

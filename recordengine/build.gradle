@@ -1,8 +1,8 @@
 apply plugin: 'com.android.library'
 
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-def superpowered_sdk_path = properties.getProperty('superpowered.dir')
+//Properties properties = new Properties()
+//properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def superpowered_sdk_path = project.projectDir.absolutePath.replace("\\", "/") + "/src/main/libs/superpowered/"
 
 android {
     compileSdkVersion 27

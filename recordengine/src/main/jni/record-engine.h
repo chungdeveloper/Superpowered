@@ -45,6 +45,8 @@ public:
 
     void stopRecord();
 
+    void enablePlayback(bool enable);
+
     void onCompressorValue(float dryWetPercent, float ratio, float attack, float release,
                            float threshold, float hpCutOffHz);
 
@@ -70,6 +72,9 @@ private:
     SuperpoweredEcho *echo;
     SuperpoweredNBandEQ *nBandEQ;
 //    SuperpoweredRecorderStoppedCallback recorderStoppedCallback;
+
+    bool isPlayback = false;
+
     float *eqBandList;
     const char *pathRecord;
     bool isRecording;

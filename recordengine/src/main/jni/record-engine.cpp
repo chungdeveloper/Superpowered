@@ -1,4 +1,5 @@
 #include "record-engine.h"
+#include <media-engine.h>
 #include <jni.h>
 #include <stdlib.h>
 #include <SuperpoweredSimple.h>
@@ -8,11 +9,12 @@
 #include <string.h>
 #include <pthread.h>
 
+//=====================================RECORD MODULE================================================
+
 static RecordEngine *executeProcess = NULL;
 
-static bool
-audioProcessing(void *__unused clientdata, short int *audioInputOutput, int numberOfSamples,
-                int __unused samplerate) {
+static bool audioProcessing(void *__unused clientdata, short int *audioInputOutput,
+                            int numberOfSamples, int __unused samplerate) {
     return executeProcess->process(audioInputOutput, (unsigned int) numberOfSamples);
 }
 
@@ -31,7 +33,7 @@ bool RecordEngine::process(short int *audioInputOutput, unsigned int numberOfSam
     nBandEQ->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
     SuperpoweredFloatToShortInt(inputBufferFloat, audioInputOutput, numberOfSamples);
 //    onSampleRecordListener(audioInputOutput, numberOfSamples);
-    return true;
+    return isPlayback;
 }
 
 void __unused RecordEngine::onSampleRecordListener(short *data, int sampleSize) {
@@ -223,6 +225,10 @@ void RecordEngine::startRecordPath(const char *path) {
     isRecording = true;
 }
 
+void RecordEngine::enablePlayback(bool enable) {
+    isPlayback = enable;
+}
+
 
 extern "C" JNIEXPORT void
 Java_vn_soft_dc_recordengine_RecorderEngine_FrequencyDomain(JNIEnv *__unused javaEnvironment,
@@ -369,5 +375,17 @@ Java_vn_soft_dc_recordengine_RecorderEngine_release(JNIEnv *env, jobject instanc
         return;
     executeProcess->~RecordEngine();
     executeProcess = NULL;
+}
+#pragma clang diagnostic pop
+
+extern "C"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+JNIEXPORT void JNICALL
+Java_vn_soft_dc_recordengine_RecorderEngine_enablePlayback(JNIEnv *env, jobject instance,
+                                                           jboolean enable) {
+
+    executeProcess->enablePlayback(enable);
+
 }
 #pragma clang diagnostic pop

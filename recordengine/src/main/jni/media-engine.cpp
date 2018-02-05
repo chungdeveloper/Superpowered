@@ -1,11 +1,13 @@
-#include "media-engine.h"
+#include <media-engine.h>
 #include <SuperpoweredSimple.h>
 #include <SuperpoweredCPU.h>
 #include <android/log.h>
+#include <malloc.h>
+#include <stdio.h>
+#include <string.h>
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_AndroidConfiguration.h>
-#include <malloc.h>
-#include <string.h>
+#include "record-engine.h"
 
 static jmethodID midStrCallbackFromC;
 static jmethodID midMusicCompletion;
@@ -87,17 +89,48 @@ static void playerEventCallbackB(void *clientData, SuperpoweredAdvancedAudioPlay
 
 static bool audioProcessing(void *clientdata, short int *audioIO, int numberOfSamples,
                             int __unused samplerate) {
-    return ((SuperpoweredProcess *) clientdata)->process(audioIO, (unsigned int) numberOfSamples);
+    return ((MediaEngine *) clientdata)->process(audioIO, (unsigned int) numberOfSamples);
 }
 
-SuperpoweredProcess::SuperpoweredProcess(JNIEnv *env, jobject obj, unsigned int samplerate,
-                                         unsigned int buffersize,
-                                         const char *pathVoice, const char *pathBeat,
-                                         int fileAoffset, int fileAlength,
-                                         int fileBoffset, int fileBlength) : activeFx(0),
-                                                                             crossValue(0.0f),
-                                                                             volB(0.5f),
-                                                                             volA(0.5f) {
+MediaEngine::MediaEngine(unsigned int samplerate, unsigned int buffersize,
+                         const char *path, int fileAoffset, int fileAlength,
+                         int fileBoffset, int fileBlength) : activeFx(0),
+                                                             crossValue(0.0f),
+                                                             volB(0.0f),
+                                                             volA(1.0f * headroom) {
+    stereoBuffer = (float *) memalign(16, (buffersize + 16) * sizeof(float) * 2);
+
+    playerA = new SuperpoweredAdvancedAudioPlayer(&playerA, playerEventCallbackA, samplerate, 0);
+    playerA->open(path, fileAoffset, fileAlength);
+    playerB = new SuperpoweredAdvancedAudioPlayer(&playerB, playerEventCallbackB, samplerate, 0);
+    playerB->open(path, fileBoffset, fileBlength);
+
+    playerA->syncMode = playerB->syncMode = SuperpoweredAdvancedAudioPlayerSyncMode_TempoAndBeat;
+
+    roll = new SuperpoweredRoll(samplerate);
+    filter = new SuperpoweredFilter(SuperpoweredFilter_Resonant_Lowpass, samplerate);
+    flanger = new SuperpoweredFlanger(samplerate);
+    reverb = new SuperpoweredReverb(samplerate);
+    limiter = new SuperpoweredLimiter(samplerate);
+    compressor = new SuperpoweredCompressor(samplerate);
+    threeBandEQ = new Superpowered3BandEQ(samplerate);
+    echo = new SuperpoweredEcho(samplerate);
+
+    audioSystem = new SuperpoweredAndroidAudioIO(samplerate, buffersize, false, true,
+                                                 audioProcessing, this, -1,
+                                                 SL_ANDROID_STREAM_MEDIA,
+                                                 buffersize * 2);
+}
+
+MediaEngine::MediaEngine(JNIEnv *env, jobject obj, unsigned int samplerate,
+                         unsigned int buffersize,
+                         const char *pathVoice, const char *pathBeat,
+                         int fileAoffset, int fileAlength,
+                         int fileBoffset, int fileBlength) : activeFx(0),
+                                                             crossValue(0.0f),
+                                                             volB(0.0f),
+                                                             volA(1.0f * headroom) {
+
     stereoBuffer = (float *) memalign(16, (buffersize + 16) * sizeof(float) * 2);
     playerA = new SuperpoweredAdvancedAudioPlayer(&playerA, playerEventCallbackA, samplerate, 0);
     playerA->open(pathVoice, fileAoffset, fileAlength);
@@ -126,26 +159,26 @@ SuperpoweredProcess::SuperpoweredProcess(JNIEnv *env, jobject obj, unsigned int 
     char *tempResult = (char *) malloc(1 + strlen(pathVoice) + strlen(pathTemp));
     strcpy(tempResult, pathVoice);
     strcat(tempResult, pathTemp);
+    recorder = new SuperpoweredRecorder(tempResult, 44100, 1);
+
     jniEnv = env;
     objectClass = obj;
     jclass targetClass = (jniEnv)->GetObjectClass(objectClass);
 
-//    midStrCallbackFromC = (jniEnv)->GetMethodID(targetClass, "callbackFromC", sigStr);
-//    midMusicCompletion = (jniEnv)->GetMethodID(targetClass, "onMusicCompletion", sigStr);
-//    midMusicStart = (jniEnv)->GetMethodID(targetClass, "onMusicStart", sigStr);
+    midStrCallbackFromC = (jniEnv)->GetMethodID(targetClass, "callbackFromC", sigStr);
+    midMusicCompletion = (jniEnv)->GetMethodID(targetClass, "onMusicCompletion", sigStr);
+    midMusicStart = (jniEnv)->GetMethodID(targetClass, "onMusicStart", sigStr);
 
     isRemove = false;
 
-//    callbackFromC();
-//    onMusicStart();
-//    onMusicCompletion();
+    callbackFromC();
     audioSystem = new SuperpoweredAndroidAudioIO(samplerate, buffersize, false, true,
                                                  audioProcessing, this, -1,
                                                  SL_ANDROID_STREAM_MEDIA,
                                                  buffersize * 2);
 }
 
-SuperpoweredProcess::~SuperpoweredProcess() {
+MediaEngine::~MediaEngine() {
     if (isRemove)
         return;
     delete audioSystem;
@@ -155,28 +188,28 @@ SuperpoweredProcess::~SuperpoweredProcess() {
     free(eqBandList);
 }
 
-void SuperpoweredProcess::onReset() {
+void MediaEngine::onReset() {
     playerA->~SuperpoweredAdvancedAudioPlayer();
     playerB->~SuperpoweredAdvancedAudioPlayer();
 }
 
-void SuperpoweredProcess::onPlayPause(bool play) {
+void MediaEngine::onPlayPause(bool play) {
     if (!play) {
         playerA->pause();
         playerB->pause();
     } else {
-//        bool masterIsA = (crossValue <= 0.5f);
-        playerA->play(true);
-        playerB->play(true);
+        bool masterIsA = (crossValue <= 0.5f);
+        playerA->play(!masterIsA);
+        playerB->play(masterIsA);
     };
     SuperpoweredCPU::setSustainedPerformanceMode(play); // <-- Important to prevent audio dropouts.
 }
 
-void SuperpoweredProcess::onLimiterState(bool state) {
+void MediaEngine::onLimiterState(bool state) {
     limiter->enable(state);
 }
 
-void SuperpoweredProcess::onCrossfader(int value) {
+void MediaEngine::onCrossfader(int value) {
     crossValue = float(value) * 0.01f;
     if (crossValue < 0.01f) {
         volA = 1.0f * headroom;
@@ -190,12 +223,12 @@ void SuperpoweredProcess::onCrossfader(int value) {
     };
 }
 
-void SuperpoweredProcess::onFxSelect(int value) {
-    __android_log_print(ANDROID_LOG_VERBOSE, "SuperpoweredProcess", "FXSEL %i", value);
+void MediaEngine::onFxSelect(int value) {
+    __android_log_print(ANDROID_LOG_VERBOSE, "MediaEngine", "FXSEL %i", value);
     activeFx = (unsigned char) value;
 }
 
-void SuperpoweredProcess::onFxOff() {
+void MediaEngine::onFxOff() {
     filter->enable(false);
     roll->enable(false);
     flanger->enable(false);
@@ -213,7 +246,7 @@ static inline float floatToFrequency(float value) {
     return value < MAXFREQ ? value : MAXFREQ;
 }
 
-void SuperpoweredProcess::onFxValue(int ivalue) {
+void MediaEngine::onFxValue(int ivalue) {
     float value = float(ivalue) * 0.01f;
     switch (activeFx) {
         case 1:
@@ -240,8 +273,8 @@ void SuperpoweredProcess::onFxValue(int ivalue) {
     };
 }
 
-void SuperpoweredProcess::onCompressorValue(float dryWetPercent, float ratio, float attack,
-                                            float release, float threshold, float hpCutOffHz) {
+void MediaEngine::onCompressorValue(float dryWetPercent, float ratio, float attack,
+                                    float release, float threshold, float hpCutOffHz) {
     compressor->enable(true);
     compressor->wet = dryWetPercent;
     compressor->ratio = ratio;
@@ -251,23 +284,23 @@ void SuperpoweredProcess::onCompressorValue(float dryWetPercent, float ratio, fl
     compressor->hpCutOffHz = hpCutOffHz;
 }
 
-void SuperpoweredProcess::onCompressEnable(bool isEnable) {
+void MediaEngine::onCompressEnable(bool isEnable) {
     compressor->enable(isEnable);
 }
 
-void SuperpoweredProcess::onPitchShift(int value) {
+void MediaEngine::onPitchShift(int value) {
     playerA->setPitchShiftCents(value);
 }
 
-void SuperpoweredProcess::onBandValues(float low, float mid, float high) {
+void MediaEngine::onBandValues(float low, float mid, float high) {
     threeBandEQ->enable(true);
     threeBandEQ->bands[0] = low;
     threeBandEQ->bands[1] = mid;
     threeBandEQ->bands[2] = high;
 }
 
-void SuperpoweredProcess::onEchoValue(float dry, float wet, float bpm, float beats, float decay,
-                                      float mix) {
+void MediaEngine::onEchoValue(float dry, float wet, float bpm, float beats, float decay,
+                              float mix) {
     echo->enable(true);
     echo->dry = dry;
     echo->wet = wet;
@@ -278,9 +311,9 @@ void SuperpoweredProcess::onEchoValue(float dry, float wet, float bpm, float bea
 }
 
 
-void SuperpoweredProcess::onProcessBandEQ(float value0, float value1, float value2, float value3,
-                                          float value4, float value5, float value6, float value7,
-                                          float value8, float value9) {
+void MediaEngine::onProcessBandEQ(float value0, float value1, float value2, float value3,
+                                  float value4, float value5, float value6, float value7,
+                                  float value8, float value9) {
     nBandEQ->enable(true);
     nBandEQ->setBand(0, value0);
     nBandEQ->setBand(1, value1);
@@ -294,22 +327,22 @@ void SuperpoweredProcess::onProcessBandEQ(float value0, float value1, float valu
     nBandEQ->setBand(9, value9);
 }
 
-void SuperpoweredProcess::onSeekTime(double d) {
+void MediaEngine::onSeekTime(double d) {
     playerA->setPosition(d, false, false);
     playerB->setPosition(d, false, false);
 }
 
-double SuperpoweredProcess::onGetPosition() {
+double MediaEngine::onGetPosition() {
     return playerA->positionMs;
 }
 
-double SuperpoweredProcess::onGetTotalDuration() {
+double MediaEngine::onGetTotalDuration() {
     return playerA->durationMs;
 }
 
-void SuperpoweredProcess::onFxReverbValue(int param, float value) {
-    double scaleValue = value;//
-    __android_log_print(ANDROID_LOG_VERBOSE, "SuperpoweredProcess", "Param: %i , Value: %0.2f",
+void MediaEngine::onFxReverbValue(int param, int value) {
+    double scaleValue = 0.01 * value;
+    __android_log_print(ANDROID_LOG_VERBOSE, "MediaEngine", "Param: %i , Value: %0.2f",
                         param, scaleValue);
     reverb->enable(true);
     switch (param) {
@@ -334,27 +367,11 @@ void SuperpoweredProcess::onFxReverbValue(int param, float value) {
     }
 }
 
-
-void SuperpoweredProcess::onVolumeVoice(int value) {
-    volA = value * 0.01;
-}
-
-void SuperpoweredProcess::onVolumeBeat(int value) {
-    volB = value * 0.01;
-//    if (volumeChange > 0.99f) {
-//        volB = 1.0f * headroom;
-//    } else if (volumeChange < 0.01f) {
-//        volB = 0.0f;
-//    } else {
-//        volB = cosf(float(M_PI_2) * volumeChange) * headroom;
-//    }
-}
-
-double SuperpoweredProcess::getReverbParams() {
+double MediaEngine::getReverbParams() {
     return 0;
 }
 
-bool SuperpoweredProcess::process(short int *output, unsigned int numberOfSamples) {
+bool MediaEngine::process(short int *output, unsigned int numberOfSamples) {
     bool masterIsA = (crossValue <= 0.5f);
     double masterBpm = masterIsA ? playerA->currentBpm : playerB->currentBpm;
     double msElapsedSinceLastBeatA = playerA->msElapsedSinceLastBeat;
@@ -363,7 +380,7 @@ bool SuperpoweredProcess::process(short int *output, unsigned int numberOfSample
                                      playerB->msElapsedSinceLastBeat);
 
     roll->bpm = flanger->bpm = (float) masterBpm; // Syncing fx is one line.
-//
+
     if (roll->process(silence ? NULL : stereoBuffer, stereoBuffer, numberOfSamples) &&
         silence)
         silence = false;
@@ -375,220 +392,165 @@ bool SuperpoweredProcess::process(short int *output, unsigned int numberOfSample
         compressor->process(stereoBuffer, stereoBuffer, numberOfSamples);
         threeBandEQ->process(stereoBuffer, stereoBuffer, numberOfSamples);
         echo->process(stereoBuffer, stereoBuffer, numberOfSamples);
+//        recorder->process(stereoBuffer, stereoBuffer, numberOfSamples);
         nBandEQ->process(stereoBuffer, stereoBuffer, numberOfSamples);
     };
 
     playerB->process(stereoBuffer, !silence, numberOfSamples, volB, masterBpm,
                      msElapsedSinceLastBeatA);
-//    playerB->process(stereoBuffer, true, numberOfSamples, volB, masterBpm,
-//                     msElapsedSinceLastBeatA);
 
-    // The stereoBuffer is ready now, let's put the finished audio into the requested buffers.
-//    if (!silence) SuperpoweredFloatToShortInt(stereoBuffer, output, numberOfSamples);
     if (!silence) SuperpoweredFloatToShortInt(stereoBuffer, output, numberOfSamples);
     return !silence;
 }
 
-static SuperpoweredProcess *process = NULL;
-
-
-extern "C" JNIEXPORT void
-Java_vn_soft_dc_recordengine_MediaEngine_onVolumeVoice(JNIEnv *env, jobject instance,
-                                                       jint value) {
-
-    process->onVolumeVoice(value);
-
+void MediaEngine::startRecord(JNIEnv *env, jstring path, jstring temp) {
+    const char *pathTemp = env->GetStringUTFChars(temp, false);
+    const char *outPath = env->GetStringUTFChars(path, false);
+//    recorder->setSamplerate(44100);
+//    isRecording = recorder->start(outPath);
+    env->ReleaseStringUTFChars(temp, pathTemp);
+    env->ReleaseStringUTFChars(path, outPath);
 }
 
-extern "C" JNIEXPORT void
-Java_vn_soft_dc_recordengine_MediaEngine_onVolumeBeat(JNIEnv *env, jobject instance,
-                                                      jint value) {
-
-    process->onVolumeBeat(value);
-
-}
-
-extern "C" JNIEXPORT  void
-Java_vn_soft_dc_recordengine_MediaEngine_onPlayPause(JNIEnv *env, jobject instance,
-                                                     jboolean play) {
-    process->onPlayPause(play);
+void MediaEngine::stopRecord() {
+//    if (isRecording) {
+//        recorder->stop();
+//    }
 }
 
 
-extern "C" JNIEXPORT  void
-Java_vn_soft_dc_recordengine_MediaEngine_onFxSelect(JNIEnv *env, jobject instance,
-                                                    jint value) {
-    process->onFxSelect(value);
+static MediaEngine *example = NULL;
+
+extern "C" JNIEXPORT void Java_com_superpowered_crossexample_MediaEngine_MediaEngine(
+        JNIEnv *javaEnvironment, jobject __unused obj, jint samplerate, jint buffersize,
+        jstring apkPath, jint fileAoffset, jint fileAlength, jint fileBoffset, jint fileBlength) {
+
+    const char *path = javaEnvironment->GetStringUTFChars(apkPath, JNI_FALSE);
+    example = new MediaEngine((unsigned int) samplerate, (unsigned int) buffersize, path,
+                              fileAoffset, fileAlength, fileBoffset, fileBlength);
+    javaEnvironment->ReleaseStringUTFChars(apkPath, path);
 }
 
-extern "C" JNIEXPORT  void
-Java_vn_soft_dc_recordengine_MediaEngine_onSeekTime(JNIEnv *env, jobject instance,
-                                                    jdouble v) {
+extern "C" JNIEXPORT void Java_vn_soft_dc_recordengine_MediaEngine_SuperpoweredProcessDouble(
+        JNIEnv *env, jobject __unused obj, jint samplerate, jint buffersize,
+        jstring pathVoice, jstring pathBeat, jint fileAoffset, jint fileAlength, jint fileBoffset,
+        jint fileBlength) {
+    const char *pathVoiceC = env->GetStringUTFChars(pathVoice, 0);
+    const char *pathBeatC = env->GetStringUTFChars(pathBeat, 0);
 
-    process->onSeekTime(v);
+    example = new MediaEngine(env, obj, (unsigned int) samplerate,
+                              (unsigned int) buffersize,
+                              pathVoiceC, pathBeatC, fileAoffset, fileAlength, fileBoffset,
+                              fileBlength);
 
-}
-
-extern "C" JNIEXPORT  jdouble
-Java_vn_soft_dc_recordengine_MediaEngine_onGetPosition(JNIEnv *env, jobject instance) {
-
-    return process->onGetPosition();
-
-}
-
-extern "C" JNIEXPORT  jdouble
-Java_vn_soft_dc_recordengine_MediaEngine_onGetTotalDuration(JNIEnv *env,
-                                                            jobject instance) {
-
-    return process->onGetTotalDuration();
-
-}
-
-extern "C" JNIEXPORT  void
-Java_vn_soft_dc_recordengine_MediaEngine_onCompressEnable(JNIEnv *env, jobject instance,
-                                                          jboolean isEnable) {
-    process->onCompressEnable(isEnable);
-}
-
-extern "C" JNIEXPORT  void
-Java_vn_soft_dc_recordengine_MediaEngine_onCompressorValue(JNIEnv *env,
-                                                           jobject instance,
-                                                           jfloat dryWetPercent,
-                                                           jfloat ratio, jfloat attack,
-                                                           jfloat release,
-                                                           jfloat threshold,
-                                                           jfloat hpCutOffHz) {
-
-    process->onCompressorValue(dryWetPercent, ratio, attack, release, threshold, hpCutOffHz);
+    env->ReleaseStringUTFChars(pathVoice, pathVoiceC);
+    env->ReleaseStringUTFChars(pathBeat, pathBeatC);
 
 }
 
-extern "C" JNIEXPORT  void
-Java_vn_soft_dc_recordengine_MediaEngine_onFxValue(JNIEnv *env, jobject instance,
-                                                   jint value) {
-
-    process->onFxValue(value);
-
+extern "C" JNIEXPORT void Java_vn_soft_dc_recordengine_MediaEngine_onPlayPause(
+        JNIEnv *__unused javaEnvironment, jobject __unused obj, jboolean play) {
+    example->onPlayPause(play);
 }
 
-extern "C" JNIEXPORT  void
-Java_vn_soft_dc_recordengine_MediaEngine_onPitchShift(JNIEnv *env, jobject instance,
-                                                      jint value) {
-
-    process->onPitchShift(value);
-
+extern "C" JNIEXPORT void Java_vn_soft_dc_recordengine_MediaEngine_onCrossfader(
+        JNIEnv *__unused javaEnvironment, jobject __unused obj, jint value) {
+    example->onCrossfader(value);
 }
 
-//extern "C" JNIEXPORT  jdoubleArray
-//Java_vn_soft_dc_recordengine_MediaEngine_getReverbParams(JNIEnv *env,
-//                                                                  jobject instance) {
-//
-//    // TODO
-//
-//}
-
-extern "C" JNIEXPORT  void
-Java_vn_soft_dc_recordengine_MediaEngine_onEchoValue(JNIEnv *env, jobject instance,
-                                                     jfloat dry, jfloat wet, jfloat bpm,
-                                                     jfloat beats, jfloat decay,
-                                                     jfloat mix) {
-
-    process->onEchoValue(dry, wet, bpm, beats, decay, mix);
-
+extern "C" JNIEXPORT void Java_vn_soft_dc_recordengine_MediaEngine_onPitchShift(
+        JNIEnv *__unused javaEnvironment, jobject __unused obj, jint value) {
+    example->onPitchShift(value);
 }
 
-extern "C" JNIEXPORT  void
-Java_vn_soft_dc_recordengine_MediaEngine_onBandValues(JNIEnv *env, jobject instance,
-                                                      jfloat low, jfloat mid,
-                                                      jfloat hi) {
-
-    process->onBandValues(low, mid, hi);
-
+extern "C" JNIEXPORT void Java_vn_soft_dc_recordengine_MediaEngine_onBandValues(
+        JNIEnv *__unused javaEnvironment, jobject __unused obj, jfloat low, jfloat mid, jfloat hi) {
+    example->onBandValues(low, mid, hi);
 }
 
-extern "C" JNIEXPORT  void
-Java_vn_soft_dc_recordengine_MediaEngine_onFxReverbValue(JNIEnv *env, jobject instance,
-                                                         jint reverb_type, jfloat value) {
-
-    process->onFxReverbValue(reverb_type, value);
-
+extern "C" JNIEXPORT void Java_vn_soft_dc_recordengine_MediaEngine_onCompressEnable(
+        JNIEnv *__unused javaEnvironment, jobject __unused obj, jboolean value) {
+    example->onCompressEnable(value);
 }
 
-extern "C" JNIEXPORT  void
-Java_vn_soft_dc_recordengine_MediaEngine_stopRecord(JNIEnv *env, jobject instance) {
-
-    // TODO
-
+extern "C" JNIEXPORT void Java_vn_soft_dc_recordengine_MediaEngine_onCompressorValue(
+        JNIEnv *__unused javaEnvironment, jobject __unused obj, float dryWetPercent, float ratio,
+        float attack, float release, float threshold, float hpCutOffHz) {
+    example->onCompressorValue(dryWetPercent, ratio, attack, release, threshold, hpCutOffHz);
 }
 
-extern "C" JNIEXPORT  void
-Java_vn_soft_dc_recordengine_MediaEngine_onReset(JNIEnv *env, jobject instance) {
-
-    process->onReset();
-
+extern "C" JNIEXPORT void Java_vn_soft_dc_recordengine_MediaEngine_onFxSelect(
+        JNIEnv *__unused javaEnvironment, jobject __unused obj, jint value) {
+    example->onFxSelect(value);
 }
 
-extern "C" JNIEXPORT  void
-Java_vn_soft_dc_recordengine_MediaEngine_startRecord(JNIEnv *env, jobject instance,
-                                                     jstring path_, jstring tempPath_) {
-    const char *path = env->GetStringUTFChars(path_, 0);
-    const char *tempPath = env->GetStringUTFChars(tempPath_, 0);
-
-    // TODO
-
-    env->ReleaseStringUTFChars(path_, path);
-    env->ReleaseStringUTFChars(tempPath_, tempPath);
+extern "C" JNIEXPORT void Java_vn_soft_dc_recordengine_MediaEngine_onSeekTime(
+        JNIEnv *__unused javaEnvironment, jobject __unused obj, double value) {
+    example->onSeekTime(value);
 }
 
-extern "C" JNIEXPORT  void
-Java_vn_soft_dc_recordengine_MediaEngine_onProcessBandEQ(JNIEnv *env, jobject instance,
-                                                         jfloat value0, jfloat value1,
-                                                         jfloat value2, jfloat value3,
-                                                         jfloat value4, jfloat value5,
-                                                         jfloat value6, jfloat value7,
-                                                         jfloat value8, jfloat value9) {
-
-    process->onProcessBandEQ(value0, value1, value2, value3, value4, value5, value6, value7, value8,
+extern "C" JNIEXPORT void Java_vn_soft_dc_recordengine_MediaEngine_onProcessBandEQ(
+        JNIEnv *__unused javaEnvironment, jobject __unused obj, float value0, float value1,
+        float value2, float value3,
+        float value4, float value5, float value6, float value7,
+        float value8, float value9) {
+    example->onProcessBandEQ(value0, value1, value2, value3, value4, value5, value6, value7, value8,
                              value9);
-
 }
 
-
-extern "C" JNIEXPORT void
-Java_vn_soft_dc_recordengine_MediaEngine_onLimiterOpenClose(JNIEnv *env,
-                                                            jobject instance,
-                                                            jboolean state) {
-
-    process->onLimiterState(state);
+extern "C" JNIEXPORT double Java_vn_soft_dc_recordengine_MediaEngine_onGetPosition(
+        JNIEnv *__unused javaEnvironment, jobject __unused obj) {
+    return example->onGetPosition();
 }
 
-extern "C" JNIEXPORT void
-Java_vn_soft_dc_recordengine_MediaEngine_onCrossfader(JNIEnv *env, jobject instance,
-                                                      jint value) {
-
-    process->onCrossfader(value);
-
+extern "C" JNIEXPORT double Java_com_superpowered_crossexample_MediaEngine_getReverbParams(
+        JNIEnv *__unused javaEnvironment, jobject __unused obj) {
+    return example->getReverbParams();
 }
 
-extern "C" JNIEXPORT void
-Java_vn_soft_dc_recordengine_MediaEngine_SuperpoweredProcessDouble(JNIEnv *env,
-                                                                   jobject instance,
-                                                                   jint samplerate,
-                                                                   jint buffersize,
-                                                                   jstring pathVoice_,
-                                                                   jstring pathBeat_,
-                                                                   jint fileAoffset,
-                                                                   jint fileAlength,
-                                                                   jint fileBoffset,
-                                                                   jint fileBlength) {
-    const char *pathVoice = env->GetStringUTFChars(pathVoice_, 0);
-    const char *pathBeat = env->GetStringUTFChars(pathBeat_, 0);
+extern "C" JNIEXPORT double Java_vn_soft_dc_recordengine_MediaEngine_onGetTotalDuration(
+        JNIEnv *__unused javaEnvironment, jobject __unused obj) {
+    return example->onGetTotalDuration();
+}
 
-    process = new SuperpoweredProcess(env, instance, (unsigned int) samplerate,
-                                      (unsigned int) buffersize,
-                                      pathVoice, pathBeat, fileAoffset, fileAlength, fileBoffset,
-                                      fileBlength);
+extern "C" JNIEXPORT void Java_com_superpowered_crossexample_MediaEngine_onFxOff(
+        JNIEnv *__unused javaEnvironment, jobject __unused obj) {
+    example->onFxOff();
+}
 
-    env->ReleaseStringUTFChars(pathVoice_, pathVoice);
-    env->ReleaseStringUTFChars(pathBeat_, pathBeat);
+extern "C" JNIEXPORT void Java_vn_soft_dc_recordengine_MediaEngine_onReset(
+        JNIEnv *__unused javaEnvironment, jobject __unused obj) {
+    example->onReset();
+}
+
+extern "C" JNIEXPORT void Java_vn_soft_dc_recordengine_MediaEngine_onFxValue(
+        JNIEnv *__unused javaEnvironment, jobject __unused obj, jint value) {
+    example->onFxValue(value);
+}
+
+extern "C" JNIEXPORT void Java_vn_soft_dc_recordengine_MediaEngine_onEchoValue(
+        JNIEnv *__unused javaEnvironment, jobject __unused obj, float dry, float wet, float bpm,
+        float beats, float decay,
+        float mix) {
+    example->onEchoValue(dry, wet, bpm, beats, decay, mix);
+}
+
+extern "C" JNIEXPORT void Java_com_superpowered_crossexample_MediaEngine_startRecord(
+        JNIEnv *javaEnvironment, jobject __unused obj, jstring path, jstring temp) {
+    example->startRecord(javaEnvironment, path, temp);
+}
+
+extern "C" JNIEXPORT void Java_vn_soft_dc_recordengine_MediaEngine_stopRecord(
+        JNIEnv *__unused javaEnvironment, jobject __unused obj) {
+    example->stopRecord();
+}
+
+extern "C" JNIEXPORT void Java_vn_soft_dc_recordengine_MediaEngine_onFxReverbValue(
+        JNIEnv *__unused javaEnvironment, jobject __unused obj, jint param, jint value) {
+    example->onFxReverbValue(param, value);
+}
+
+extern "C" JNIEXPORT void Java_vn_soft_dc_recordengine_MediaEngine_onLimiterOpenClose(
+        JNIEnv *__unused javaEnvironment, jobject __unused obj, jboolean state) {
+    example->onLimiterState(state);
 }
