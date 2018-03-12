@@ -26,7 +26,7 @@ public class MediaActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         mMediaEngine = new MediaEngine(getApplicationContext());
-        String beat = Environment.getExternalStorageDirectory() + "/Superpowered/beat/Em-Gai-Mua-Beat-Huong-Tram.mp3";
+        String beat = Environment.getExternalStorageDirectory() + "/Superpowered/beat/2.mp3";
         String vocal = Environment.getExternalStorageDirectory() + "/Superpowered/voice/Em-Gai-Mua-Huong-Tram.mp3";
         String buffersizeString = 1024 + "";
         if (Build.VERSION.SDK_INT >= 17) {
@@ -42,7 +42,7 @@ public class MediaActivity extends AppCompatActivity {
     @OnClick(R.id.play)
     public void onViewClicked() {
         mMediaEngine.play();
-        mMediaEngine.setVolumeBeat(100);
-        mMediaEngine.setVolumeVocal(100);
+//        mMediaEngine.setVolumeBeat(100);
+//        mMediaEngine.setVolumeVocal(100);
     }
 }

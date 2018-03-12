@@ -22,6 +22,12 @@
             android:textSize="48sp" />
 
         <Button
+            android:id="@+id/btnMedia"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Media" />
+
+        <Button
             android:id="@+id/btnStart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

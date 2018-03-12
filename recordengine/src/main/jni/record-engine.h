@@ -31,11 +31,12 @@ class RecordEngine {
 public:
     void setReverbParams(int paramID, float value);
 
-    RecordEngine(int bufferSize, int sampleRate);
+//    RecordEngine(int bufferSize, int sampleRate);
 
     RecordEngine(JNIEnv *env, jobject jObject, const char *path, int bufferSize, int sampleRate);
 
-    bool process(short int *audioInputOutput, unsigned int numberOfSamples);
+    bool
+    process(short int *audioInputOutput, unsigned int numberOfSamples, unsigned int sampleRate);
 
     void startRecord();
 

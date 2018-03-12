@@ -4,6 +4,7 @@ import android.os.Environment;
 
 import vn.soft.dc.recordengine.audio.calculators.AudioCalculator;
 import vn.soft.dc.recordengine.model.Preset;
+import vn.soft.dc.recordengine.util.FileUtils;
 
 import static vn.soft.dc.recordengine.model.Preset.REVERB_DAMP;
 import static vn.soft.dc.recordengine.model.Preset.REVERB_DRY;
@@ -32,12 +33,14 @@ public class RecorderEngine {
     }
 
     public RecorderEngine(int sampleRate, int bufferSize) {
+//        System.loadLibrary(LIB_CPP);
         mAudioCalculator = new AudioCalculator();
         FrequencyDomainWithRecorder(Environment.getExternalStorageDirectory() + "/record/" + System.currentTimeMillis() + ".wav", sampleRate, bufferSize);
     }
 
     @SuppressWarnings("unused")
     public RecorderEngine(int sampleRate, int bufferSize, OnRecordEventListener onRecordEventListener) {
+//        System.loadLibrary(LIB_CPP);
         mAudioCalculator = new AudioCalculator();
         this.onRecordEventListener = onRecordEventListener;
         FrequencyDomainWithRecorder(Environment.getExternalStorageDirectory() + "/record/" + System.currentTimeMillis() + ".wav", sampleRate, bufferSize);

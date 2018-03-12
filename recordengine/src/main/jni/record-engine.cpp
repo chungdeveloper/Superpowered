@@ -8,6 +8,12 @@
 #include <SLES/OpenSLES_AndroidConfiguration.h>
 #include <string.h>
 #include <pthread.h>
+#include <SuperpoweredRecorder.h>
+#include <SuperpoweredCompressor.h>
+#include <Superpowered3BandEQ.h>
+#include <SuperpoweredEcho.h>
+#include <SuperpoweredReverb.h>
+#include <SuperpoweredNBandEQ.h>
 
 //=====================================RECORD MODULE================================================
 
@@ -15,21 +21,24 @@ static RecordEngine *executeProcess = NULL;
 
 static bool audioProcessing(void *__unused clientdata, short int *audioInputOutput,
                             int numberOfSamples, int __unused samplerate) {
-    return executeProcess->process(audioInputOutput, (unsigned int) numberOfSamples);
+    return executeProcess->process(audioInputOutput, (unsigned int) numberOfSamples,
+                                   (unsigned int) samplerate);
 }
 
 // This is called periodically by the media server.
-bool RecordEngine::process(short int *audioInputOutput, unsigned int numberOfSamples) {
+bool
+RecordEngine::process(short int *audioInputOutput, unsigned int numberOfSamples,
+                      unsigned int sampleRate) {
     SuperpoweredShortIntToFloat(audioInputOutput, inputBufferFloat,
                                 numberOfSamples);
     if (isRecording) {
         SuperpoweredDeInterleave(inputBufferFloat, recordBufferFloat, recordBufferFloat,
                                  numberOfSamples);
+        recorder->setSamplerate(sampleRate);
         recorder->process(recordBufferFloat, numberOfSamples);
     }
     reverb->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
     compressor->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
-    threeBandEQ->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
     nBandEQ->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
     SuperpoweredFloatToShortInt(inputBufferFloat, audioInputOutput, numberOfSamples);
 //    onSampleRecordListener(audioInputOutput, numberOfSamples);
@@ -48,12 +57,13 @@ void __unused RecordEngine::onSampleRecordListener(short *data, int sampleSize) 
 #pragma clang diagnostic ignored "-Wwritable-strings"
 #pragma clang diagnostic ignored "-Wreturn-stack-address"
 
+
 RecordEngine::RecordEngine(JNIEnv *env, jobject instance, const char *path, int bufferSize,
                            int sampleRate) {
     jniEnv = env;
     jObject = instance;
     targetClass = (jniEnv)->GetObjectClass(jObject);
-    pathRecord = path;
+    pathRecord = path;// "/storage/emulated/0/zalo/1520307248772.wav";// path;
     isRecording = false;
     onInitDoneMethodID = (jniEnv)->GetMethodID(targetClass, "onInitDoneListener", sigVoidIntMethod);
     (jniEnv)->GetJavaVM(&javaVM);
@@ -66,7 +76,7 @@ RecordEngine::RecordEngine(JNIEnv *env, jobject instance, const char *path, int 
                         16000.0f, 0.0f};
     eqBandList = tmpValue;
 
-    recorder = new SuperpoweredRecorder(path, (unsigned int) bufferSize, 0, 1, false,
+    recorder = new SuperpoweredRecorder(pathRecord, (unsigned int) sampleRate, 0, 1, false,
                                         NULL, this);
     compressor = new SuperpoweredCompressor((unsigned int) sampleRate);
     threeBandEQ = new Superpowered3BandEQ((unsigned int) sampleRate);
@@ -90,15 +100,15 @@ RecordEngine::RecordEngine(JNIEnv *env, jobject instance, const char *path, int 
 
 #pragma clang diagnostic pop
 
-RecordEngine::RecordEngine(int bufferSize, int sampleRate) {
-    reverb = new SuperpoweredReverb((unsigned int) sampleRate);
-    reverb->enable(true);
-    SuperpoweredCPU::setSustainedPerformanceMode(true);
-    audioSystem = new SuperpoweredAndroidAudioIO(sampleRate, bufferSize, true, true,
-                                                 audioProcessing, NULL, -1,
-                                                 SL_ANDROID_STREAM_MEDIA,
-                                                 bufferSize * 2);
-}
+//RecordEngine::RecordEngine(int bufferSize, int sampleRate) {
+//    reverb = new SuperpoweredReverb((unsigned int) sampleRate);
+//    reverb->enable(true);
+//    SuperpoweredCPU::setSustainedPerformanceMode(true);
+//    audioSystem = new SuperpoweredAndroidAudioIO(sampleRate, bufferSize, true, true,
+//                                                 audioProcessing, NULL, -1,
+//                                                 SL_ANDROID_STREAM_MEDIA,
+//                                                 bufferSize * 2);
+//}
 
 
 void RecordEngine::setReverbParams(int param, float scaleValue) {
@@ -138,7 +148,7 @@ RecordEngine::~RecordEngine() {
 //    delete targetClass;
     free(recordBufferFloat);
     free(inputBufferFloat);
-    free(samples);
+//    free(samples);
     delete pathRecord;
 //    delete eqBandList;
     delete audioSystem;
@@ -220,7 +230,7 @@ void RecordEngine::enableEffect(bool enable) {
 void RecordEngine::startRecordPath(const char *path) {
     if (isRecording)
         return;
-    recorder->addToTracklist(RECORD_ART, RECORD_TITLE, 0123);
+//    recorder->addToTracklist(RECORD_ART, RECORD_TITLE, 0, false);
     recorder->start(path);
     isRecording = true;
 }
@@ -230,13 +240,13 @@ void RecordEngine::enablePlayback(bool enable) {
 }
 
 
-extern "C" JNIEXPORT void
-Java_vn_soft_dc_recordengine_RecorderEngine_FrequencyDomain(JNIEnv *__unused javaEnvironment,
-                                                            jobject __unused obj,
-                                                            jint samplerate,
-                                                            jint buffersize) {
-    executeProcess = new RecordEngine(buffersize, samplerate);
-}
+//extern "C" JNIEXPORT void
+//Java_vn_soft_dc_recordengine_RecorderEngine_FrequencyDomain(JNIEnv *__unused javaEnvironment,
+//                                                            jobject __unused obj,
+//                                                            jint samplerate,
+//                                                            jint buffersize) {
+//    executeProcess = new RecordEngine(buffersize, samplerate);
+//}
 
 
 #pragma clang diagnostic push
@@ -360,7 +370,7 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_vn_soft_dc_recordengine_RecorderEngine_startRecordFilePath(JNIEnv *env, jobject instance,
                                                                 jstring pathTarget_) {
-    const char *pathTarget = env->GetStringUTFChars(pathTarget_, 0);
+    const char *pathTarget = env->GetStringUTFChars(pathTarget_, false);
     executeProcess->startRecordPath(pathTarget);
     env->ReleaseStringUTFChars(pathTarget_, pathTarget);
 }

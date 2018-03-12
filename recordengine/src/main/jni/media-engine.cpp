@@ -128,8 +128,8 @@ MediaEngine::MediaEngine(JNIEnv *env, jobject obj, unsigned int samplerate,
                          int fileAoffset, int fileAlength,
                          int fileBoffset, int fileBlength) : activeFx(0),
                                                              crossValue(0.0f),
-                                                             volB(0.0f),
-                                                             volA(1.0f * headroom) {
+                                                             volB(0.5f),
+                                                             volA(0.5f) {
 
     stereoBuffer = (float *) memalign(16, (buffersize + 16) * sizeof(float) * 2);
     playerA = new SuperpoweredAdvancedAudioPlayer(&playerA, playerEventCallbackA, samplerate, 0);
@@ -198,9 +198,11 @@ void MediaEngine::onPlayPause(bool play) {
         playerA->pause();
         playerB->pause();
     } else {
-        bool masterIsA = (crossValue <= 0.5f);
-        playerA->play(!masterIsA);
-        playerB->play(masterIsA);
+//        bool masterIsA = (crossValue <= 0.5f);
+//        playerA->play(!masterIsA);
+//        playerB->play(masterIsA);
+        playerA->play(false);
+        playerB->play(false);
     };
     SuperpoweredCPU::setSustainedPerformanceMode(play); // <-- Important to prevent audio dropouts.
 }

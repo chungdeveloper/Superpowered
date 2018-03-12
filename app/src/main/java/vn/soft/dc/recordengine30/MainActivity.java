@@ -2,6 +2,7 @@ package vn.soft.dc.recordengine30;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.os.Build;
@@ -70,11 +71,17 @@ public class MainActivity extends AppCompatActivity {
         claimPermission();
     }
 
-    @OnClick({R.id.btnStart, R.id.btnStop, R.id.btnEnable, R.id.btnAcoustic, R.id.btnBolero, R.id.btnMaster, R.id.btnPopStar, R.id.btnPopStarFix, R.id.btnRap, R.id.btnStudio, R.id.btnRelease, R.id.btnInit})
+    @OnClick({R.id.btnMedia, R.id.btnStart, R.id.btnStop, R.id.btnEnable, R.id.btnAcoustic, R.id.btnBolero, R.id.btnMaster, R.id.btnPopStar, R.id.btnPopStarFix, R.id.btnRap, R.id.btnStudio, R.id.btnRelease, R.id.btnInit})
     public void onViewClicked(View view) {
         switch (view.getId()) {
+            case R.id.btnMedia:
+                mRecorderEngine.release();
+                Intent intent = new Intent(getApplicationContext(), MediaActivity.class);
+                startActivity(intent);
+                finish();
+                break;
             case R.id.btnStart:
-                mRecorderEngine.startRecord(Environment.getExternalStorageDirectory() + "/record/" + System.currentTimeMillis() + ".wav");
+                mRecorderEngine.startRecord(Environment.getExternalStorageDirectory() + "/" + System.currentTimeMillis() + ".wav");
                 break;
             case R.id.btnStop:
                 mRecorderEngine.stopRecord();
