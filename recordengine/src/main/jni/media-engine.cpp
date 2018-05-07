@@ -7,6 +7,7 @@
 #include <string.h>
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_AndroidConfiguration.h>
+#include <SuperpoweredEcho.h>
 #include "record-engine.h"
 
 static jmethodID midStrCallbackFromC;

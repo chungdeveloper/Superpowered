@@ -19,6 +19,16 @@ import java.net.URISyntaxException;
  */
 
 public class FileUtils {
+
+    public static String createFileDirectory(String pathDirectory) {
+        File file = new File(pathDirectory);
+        if (!file.exists()) {
+            return file.mkdirs() ? pathDirectory : null;
+        }
+        return pathDirectory;
+    }
+
+
     public static String readRawTextFile(Context context, int resId) {
         InputStream inputStream = context.getResources().openRawResource(resId);
 

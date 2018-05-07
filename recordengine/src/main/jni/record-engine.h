@@ -4,6 +4,7 @@
 
 #ifndef FREQUENCYDOMAIN_FREQUENCYDOMAIN_H
 #define FREQUENCYDOMAIN_FREQUENCYDOMAIN_H
+#define FFT_LOG_SIZE 11 // 2^11 = 2048
 
 #include "record-engine.h"
 #include <SuperpoweredReverb.h>
@@ -13,8 +14,8 @@
 #include <SuperpoweredCompressor.h>
 #include <Superpowered3BandEQ.h>
 #include <SuperpoweredNBandEQ.h>
-#include <SuperpoweredEcho.h>
 #include <jni.h>
+#include <SuperpoweredEcho.h>
 
 static const int REVERB_DRY = 1;
 static const int REVERB_WET = 2;
@@ -72,14 +73,14 @@ private:
     Superpowered3BandEQ *threeBandEQ;
     SuperpoweredEcho *echo;
     SuperpoweredNBandEQ *nBandEQ;
-//    SuperpoweredRecorderStoppedCallback recorderStoppedCallback;
-
-    bool isPlayback = false;
+    SuperpoweredFrequencyDomain *frequencyDomain;
+    float *magnitudeLeft, *magnitudeRight, *phaseLeft, *phaseRight, *fifoOutput, *inputBufferFloat;
+    int fifoOutputFirstSample, fifoOutputLastSample, stepSize, fifoCapacity;
+    bool isPlayback;
 
     float *eqBandList;
     const char *pathRecord;
     bool isRecording;
-    float *inputBufferFloat;
     JNIEnv *jniEnv;
     jobject jObject;
     jobject jGlobalObject;

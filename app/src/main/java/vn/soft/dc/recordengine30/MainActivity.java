@@ -149,9 +149,9 @@ public class MainActivity extends AppCompatActivity {
             AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
             buffersizeString = audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
         }
-        samplerateString = "44100";
+        samplerateString = "48000";
         if (buffersizeString == null) buffersizeString = "512";
-
+        buffersizeString = "16";
         Log.d("ChungLD", buffersizeString);
         mRecorderEngine = new RecorderEngine(Integer.parseInt(samplerateString), Integer.parseInt(buffersizeString), onRecordEventListener);
         isEnable = false;

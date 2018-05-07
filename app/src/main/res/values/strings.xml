@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">RecordEngine3.0</string>
+    <string name="error_player">Khởi tạo lỗi cmnr</string>
 </resources>

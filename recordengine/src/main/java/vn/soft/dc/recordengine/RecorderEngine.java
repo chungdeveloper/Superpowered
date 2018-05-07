@@ -4,7 +4,6 @@ import android.os.Environment;
 
 import vn.soft.dc.recordengine.audio.calculators.AudioCalculator;
 import vn.soft.dc.recordengine.model.Preset;
-import vn.soft.dc.recordengine.util.FileUtils;
 
 import static vn.soft.dc.recordengine.model.Preset.REVERB_DAMP;
 import static vn.soft.dc.recordengine.model.Preset.REVERB_DRY;
@@ -12,6 +11,7 @@ import static vn.soft.dc.recordengine.model.Preset.REVERB_MIX;
 import static vn.soft.dc.recordengine.model.Preset.REVERB_ROOMSIZE;
 import static vn.soft.dc.recordengine.model.Preset.REVERB_WET;
 import static vn.soft.dc.recordengine.model.Preset.REVERB_WIDTH;
+import static vn.soft.dc.recordengine.util.FileUtils.createFileDirectory;
 import static vn.soft.dc.recordengine.util.FileUtils.short2byte;
 
 /**
@@ -35,7 +35,7 @@ public class RecorderEngine {
     public RecorderEngine(int sampleRate, int bufferSize) {
 //        System.loadLibrary(LIB_CPP);
         mAudioCalculator = new AudioCalculator();
-        FrequencyDomainWithRecorder(Environment.getExternalStorageDirectory() + "/record/" + System.currentTimeMillis() + ".wav", sampleRate, bufferSize);
+        FrequencyDomainWithRecorder(createFileDirectory(RECORD_URI.MUSIC_TV_360_DIRECTORY_TEMP) + System.currentTimeMillis() + ".wav", sampleRate, bufferSize);
     }
 
     @SuppressWarnings("unused")
@@ -43,7 +43,7 @@ public class RecorderEngine {
 //        System.loadLibrary(LIB_CPP);
         mAudioCalculator = new AudioCalculator();
         this.onRecordEventListener = onRecordEventListener;
-        FrequencyDomainWithRecorder(Environment.getExternalStorageDirectory() + "/record/" + System.currentTimeMillis() + ".wav", sampleRate, bufferSize);
+        FrequencyDomainWithRecorder(createFileDirectory(RECORD_URI.MUSIC_TV_360_DIRECTORY_TEMP) + System.currentTimeMillis() + ".wav", sampleRate, bufferSize);
     }
 
     @SuppressWarnings("unused")
@@ -161,4 +161,14 @@ public class RecorderEngine {
 
         void onFrequencyListener(double freq);
     }
+
+    public interface RECORD_URI {
+        String SD_CARD = Environment.getExternalStorageDirectory().toString() + "/";
+        String MUSIC_TV_360_DIRECTORY = SD_CARD + "Kara360/";
+        String MUSIC_TV_360_DIRECTORY_RESOURCE = MUSIC_TV_360_DIRECTORY + "Resource/";
+        String MUSIC_TV_360_DIRECTORY_TEMP = MUSIC_TV_360_DIRECTORY + "Temp/";
+        String MUSIC_TV_360_DIRECTORY_BEAT = MUSIC_TV_360_DIRECTORY_RESOURCE + "beat/";
+        String MUSIC_TV_360_DIRECTORY_DRAFT = MUSIC_TV_360_DIRECTORY_RESOURCE + "draft/";
+    }
+
 }
