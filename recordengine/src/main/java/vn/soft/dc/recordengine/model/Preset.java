@@ -12,6 +12,8 @@ public class Preset {
     public static int REVERB_MIX = 4;
     public static int REVERB_ROOMSIZE = 5;
     public static int REVERB_DAMP = 6;
+    public static int REVERB_PREDELAY = 7;
+    public static int REVERB_LOW_CUT = 8;
 
     private float dryEcho;
     private float wetEcho;
@@ -26,6 +28,8 @@ public class Preset {
     private float roomsizeReverb;
     private float mixReverb;
     private float dampReverb;
+    private float lowcutReverb;
+    private float preDelay;
 
     private float dryCompressor;
     private float attackCompressor;
@@ -50,9 +54,9 @@ public class Preset {
 
     private int pitch;
     private int hpCut;
+    private float delay;
     private String name;
 
-    private boolean isChoose;
 
     public Preset() {
         this.dryEcho = 0;
@@ -67,6 +71,8 @@ public class Preset {
         this.roomsizeReverb = 0;
         this.mixReverb = 0;
         this.dampReverb = 0;
+        this.lowcutReverb = 0;
+        this.preDelay = 0;
         this.dryCompressor = 0;
         this.attackCompressor = 0;
         this.releaseCompressor = 0;
@@ -77,6 +83,7 @@ public class Preset {
         this.hi = 0;
         this.pitch = 0;
         this.hpCut = 0;
+        this.delay = 0;
         this.name = "";
         this.valueEQ0 = 0;
         this.valueEQ1 = 0;
@@ -88,7 +95,6 @@ public class Preset {
         this.valueEQ7 = 0;
         this.valueEQ8 = 0;
         this.valueEQ9 = 0;
-        this.isChoose = false;
     }
 
     public Preset(String name) {
@@ -107,6 +113,8 @@ public class Preset {
         this.dampReverb = 0;
         this.valueEQ0 = 0;
         this.valueEQ1 = 0;
+        this.lowcutReverb = 0;
+        this.preDelay = 0;
         this.valueEQ2 = 0;
         this.valueEQ3 = 0;
         this.valueEQ4 = 0;
@@ -125,10 +133,10 @@ public class Preset {
         this.hi = 0;
         this.pitch = 0;
         this.hpCut = 0;
-        this.isChoose = false;
+        this.delay = 0;
     }
 
-    public Preset(float dryEcho, float wetEcho, float bpmEcho, float beatsEcho, float mixEcho, float decayEcho, float dryReverb, float wetReverb, float widthReverb, float roomsizeReverb, float mixReverb, float dampReverb, float dryCompressor, float attackCompressor, float releaseCompressor, float ratioCompressor, float thresholdCompressor, float bass, float mid, float hi, float valueEQ0, float valueEQ1, float valueEQ2, float valueEQ3, float valueEQ4, float valueEQ5, float valueEQ6, float valueEQ7, float valueEQ8, float valueEQ9, int pitch, int hpCut, String name, boolean isChoose) {
+    public Preset(float dryEcho, float wetEcho, float bpmEcho, float beatsEcho, float mixEcho, float decayEcho, float dryReverb, float wetReverb, float widthReverb, float roomsizeReverb, float mixReverb, float dampReverb, float dryCompressor, float attackCompressor, float releaseCompressor, float ratioCompressor, float thresholdCompressor, float bass, float mid, float hi, float valueEQ0, float valueEQ1, float valueEQ2, float valueEQ3, float valueEQ4, float valueEQ5, float valueEQ6, float valueEQ7, float valueEQ8, float valueEQ9, int pitch, int hpCut, String name) {
         this.dryEcho = dryEcho;
         this.wetEcho = wetEcho;
         this.bpmEcho = bpmEcho;
@@ -162,7 +170,6 @@ public class Preset {
         this.pitch = pitch;
         this.hpCut = hpCut;
         this.name = name;
-        this.isChoose = isChoose;
     }
 
     public float getDryEcho() {
@@ -427,5 +434,29 @@ public class Preset {
 
     public void setValueEQ9(float valueEQ9) {
         this.valueEQ9 = valueEQ9;
+    }
+
+    public float getLowcutReverb() {
+        return lowcutReverb;
+    }
+
+    public void setLowcutReverb(float lowcutReverb) {
+        this.lowcutReverb = lowcutReverb;
+    }
+
+    public float getPreDelay() {
+        return preDelay;
+    }
+
+    public void setPreDelay(float preDelay) {
+        this.preDelay = preDelay;
+    }
+
+    public float getDelay() {
+        return delay;
+    }
+
+    public void setDelay(float delay) {
+        this.delay = delay;
     }
 }

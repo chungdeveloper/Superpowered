@@ -62,44 +62,13 @@ RecordEngine::process(short int *audioInputOutput, unsigned int numberOfSamples,
         reverb->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
         compressor->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
         nBandEQ->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
+        echo->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
+        threeBandEQ->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
         SuperpoweredFloatToShortInt(inputBufferFloat, audioInputOutput, numberOfSamples);
-        SuperpoweredFloatToShortInt(inputBufferFloat, audioInputOutput,
-                                    numberOfSamples);
+//        SuperpoweredFloatToShortInt(inputBufferFloat, audioInputOutput, numberOfSamples);
         fifoOutputFirstSample += numberOfSamples;
         return isPlayback;
     } else return false;
-//    SuperpoweredShortIntToFloat(audioInputOutput, inputBufferFloat, (unsigned int) numberOfSamples);
-//
-//    frequencyDomain->addInput(inputBufferFloat,
-//                              numberOfSamples); // Input goes to the frequency domain.
-//
-//    while (frequencyDomain->timeDomainToFrequencyDomain(magnitudeLeft, magnitudeRight, phaseLeft,
-//                                                        phaseRight)) {
-//        if (fifoOutputLastSample + stepSize >=
-//            fifoCapacity) { // This will be true for every 100th iteration only, so we save precious memory bandwidth.
-//            int samplesInFifo = fifoOutputLastSample - fifoOutputFirstSample;
-//            if (samplesInFifo > 0)
-//                memmove(fifoOutput, fifoOutput + fifoOutputFirstSample * 2,
-//                        samplesInFifo * sizeof(float) * 2);
-//            fifoOutputFirstSample = 0;
-//            fifoOutputLastSample = samplesInFifo;
-//        };
-//
-//        // Transforming back to the time domain.
-//        frequencyDomain->frequencyDomainToTimeDomain(magnitudeLeft, magnitudeRight, phaseLeft,
-//                                                     phaseRight,
-//                                                     fifoOutput + fifoOutputLastSample * 2);
-//        frequencyDomain->advance();
-//        fifoOutputLastSample += stepSize;
-//    };
-//
-//    // If we have enough samples in the fifo output buffer, pass them to the audio output.
-//    if (fifoOutputLastSample - fifoOutputFirstSample >= numberOfSamples) {
-//        SuperpoweredFloatToShortInt(fifoOutput + fifoOutputFirstSample * 2, audioInputOutput,
-//                                    (unsigned int) numberOfSamples);
-//        fifoOutputFirstSample += numberOfSamples;
-//        return true;
-//    } else return false;
 }
 
 void __unused RecordEngine::onSampleRecordListener(short *data, int sampleSize) {
@@ -192,6 +161,12 @@ void RecordEngine::setReverbParams(int param, float scaleValue) {
             break;
         case REVERB_DAMP:
             reverb->setDamp(scaleValue);
+            break;
+        case REVERB_PREDELAY:
+            reverb->setPredelay(scaleValue);
+            break;
+        case REVERB_LOW_CUT:
+            reverb->setLowCut(scaleValue);
             break;
         default:
             break;

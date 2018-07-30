@@ -5,6 +5,7 @@
     android:keepScreenOn="true"
     android:orientation="vertical"
     android:padding="20dp"
+    android:scrollbars="none"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -25,7 +26,27 @@
             android:id="@+id/btnMedia"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Media" />
+            android:text="Media"
+            android:visibility="gone" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/volume_beat"
+            android:textColor="@color/colorPrimary"
+            android:textSize="13sp" />
+
+        <SeekBar
+            android:id="@+id/sbVolumeMusic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp" />
+
+        <Button
+            android:id="@+id/btnPlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Play" />
 
         <Button
             android:id="@+id/btnStart"
@@ -62,6 +83,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Acoustic" />
+
+        <Button
+            android:id="@+id/btnKaraoke"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Karaoke" />
+
+        <Button
+            android:id="@+id/btnKaraokeRoom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Karaoke Room" />
 
         <Button
             android:id="@+id/btnBolero"

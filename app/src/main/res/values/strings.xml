@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">RecordEngine3.0</string>
     <string name="error_player">Khởi tạo lỗi cmnr</string>
+    <string name="volume_beat">Volume Beat</string>
 </resources>

@@ -15,7 +15,9 @@ import vn.soft.dc.recordengine.util.FileUtils;
 import static android.widget.Toast.LENGTH_SHORT;
 import static vn.soft.dc.recordengine.model.Preset.REVERB_DAMP;
 import static vn.soft.dc.recordengine.model.Preset.REVERB_DRY;
+import static vn.soft.dc.recordengine.model.Preset.REVERB_LOW_CUT;
 import static vn.soft.dc.recordengine.model.Preset.REVERB_MIX;
+import static vn.soft.dc.recordengine.model.Preset.REVERB_PREDELAY;
 import static vn.soft.dc.recordengine.model.Preset.REVERB_ROOMSIZE;
 import static vn.soft.dc.recordengine.model.Preset.REVERB_WET;
 import static vn.soft.dc.recordengine.model.Preset.REVERB_WIDTH;
@@ -104,6 +106,8 @@ public class MediaEngine {
         onFxReverbValue(REVERB_MIX, preset.getMixReverb());
         onFxReverbValue(REVERB_WIDTH, preset.getWidthReverb());
         onFxReverbValue(REVERB_DAMP, preset.getDampReverb());
+        onFxReverbValue(REVERB_PREDELAY, preset.getPreDelay());
+        onFxReverbValue(REVERB_LOW_CUT, preset.getLowcutReverb());
         onFxReverbValue(REVERB_ROOMSIZE, preset.getRoomsizeReverb());
 
         float dry = preset.getDryEcho();

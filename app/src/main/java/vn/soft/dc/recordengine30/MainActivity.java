@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,11 +58,28 @@ public class MainActivity extends AppCompatActivity {
     Button btnRap;
     @BindView(R.id.btnStudio)
     Button btnStudio;
+    @BindView(R.id.btnMedia)
+    Button btnMedia;
+    @BindView(R.id.btnInit)
+    Button btnInit;
+    @BindView(R.id.btnRelease)
+    Button btnRelease;
+    @BindView(R.id.btnKaraoke)
+    Button btnKaraoke;
+    @BindView(R.id.btnKaraokeRoom)
+    Button btnKaraokeRoom;
+    @BindView(R.id.btnPlay)
+    Button btnPlay;
+    @BindView(R.id.sbVolumeMusic)
+    SeekBar sbVolumeMusic;
 
     private RecorderEngine mRecorderEngine;
     private List<Preset> mPresets;
     private Gson gson;
     private boolean isEnable;
+    private int sampleRate;
+    private MediaPlayer mMediaPlayer;
+    private static final int MAX_VOLUME = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,12 +87,41 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        mMediaPlayer = MediaPlayer.create(this, R.raw.loi_tinh_beat);
+        sbVolumeMusic.setMax(MAX_VOLUME);
+        sbVolumeMusic.setOnSeekBarChangeListener(onSeekBarChangeListener);
+        mMediaPlayer.setVolume(0, 0);
         claimPermission();
     }
 
-    @OnClick({R.id.btnMedia, R.id.btnStart, R.id.btnStop, R.id.btnEnable, R.id.btnAcoustic, R.id.btnBolero, R.id.btnMaster, R.id.btnPopStar, R.id.btnPopStarFix, R.id.btnRap, R.id.btnStudio, R.id.btnRelease, R.id.btnInit})
+    private SeekBar.OnSeekBarChangeListener onSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            float log1 = (float) (Math.log(MAX_VOLUME - progress) / Math.log(MAX_VOLUME));
+            mMediaPlayer.setVolume(1 - log1, 1 - log1);
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    };
+
+    @OnClick({R.id.btnPlay, R.id.btnKaraoke, R.id.btnKaraokeRoom, R.id.btnMedia, R.id.btnStart, R.id.btnStop, R.id.btnEnable, R.id.btnAcoustic, R.id.btnBolero, R.id.btnMaster, R.id.btnPopStar, R.id.btnPopStarFix, R.id.btnRap, R.id.btnStudio, R.id.btnRelease, R.id.btnInit})
     public void onViewClicked(View view) {
         switch (view.getId()) {
+            case R.id.btnPlay:
+                if (mMediaPlayer.isPlaying()) {
+                    mMediaPlayer.pause();
+                } else {
+                    mMediaPlayer.start();
+                }
+                break;
             case R.id.btnMedia:
                 mRecorderEngine.release();
                 Intent intent = new Intent(getApplicationContext(), MediaActivity.class);
@@ -121,6 +169,12 @@ public class MainActivity extends AppCompatActivity {
             case R.id.btnInit:
                 claimPermission();
                 break;
+            case R.id.btnKaraoke:
+                mRecorderEngine.changeEffect(mPresets.get(7));
+                break;
+            case R.id.btnKaraokeRoom:
+                mRecorderEngine.changeEffect(mPresets.get(8));
+                break;
         }
     }
 
@@ -143,17 +197,19 @@ public class MainActivity extends AppCompatActivity {
         mPresets.add(gson.fromJson(readRawTextFile(getApplicationContext(), R.raw.pop_star_fix), Preset.class));
         mPresets.add(gson.fromJson(readRawTextFile(getApplicationContext(), R.raw.rap), Preset.class));
         mPresets.add(gson.fromJson(readRawTextFile(getApplicationContext(), R.raw.studio), Preset.class));
+        mPresets.add(gson.fromJson(readRawTextFile(getApplicationContext(), R.raw.karaoke), Preset.class));
+        mPresets.add(gson.fromJson(readRawTextFile(getApplicationContext(), R.raw.karaoke_room), Preset.class));
 
         String samplerateString = null, buffersizeString = null;
         if (Build.VERSION.SDK_INT >= 17) {
             AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
             buffersizeString = audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
+            sampleRate = Integer.parseInt(audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE));
         }
-        samplerateString = "48000";
         if (buffersizeString == null) buffersizeString = "512";
         buffersizeString = "16";
         Log.d("ChungLD", buffersizeString);
-        mRecorderEngine = new RecorderEngine(Integer.parseInt(samplerateString), Integer.parseInt(buffersizeString), onRecordEventListener);
+        mRecorderEngine = new RecorderEngine(sampleRate, Integer.parseInt(buffersizeString), onRecordEventListener);
         isEnable = false;
         btnEnable.setText(isEnable ? "Đang hoạt động" : "Đã vô hiệu hóa");
     }
@@ -203,4 +259,5 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         claimPermission();
     }
+
 }
