@@ -2,15 +2,15 @@
 <resources>
 
     <string name="app_name">RecordEngine3.0</string>
-    <string name="error_player">Khởi tạo lỗi cmnr</string>
+    <string name="error_player">initFail</string>
     <string name="volume_beat">Volume Beat</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="h_t_th">Hát thử</string>
-    <string name="c_i_t_hi_u_ng">Cài đặt hiệu ứng</string>
-    <string name="k_ch_ho_t_microphone">Kích hoạt Microphone</string>
-    <string name="turn_off_mic">Tắt Microphone</string>
-    <string name="quay_l_i">Quay lại</string>
-    <string name="l_u_preset">Lưu preset</string>
+    <string name="h_t_th">Sing</string>
+    <string name="c_i_t_hi_u_ng">Create Effect</string>
+    <string name="k_ch_ho_t_microphone">Enable Microphone</string>
+    <string name="turn_off_mic">Disable Microphone</string>
+    <string name="quay_l_i">Back</string>
+    <string name="l_u_preset">Save Preset</string>
 
 </resources>
