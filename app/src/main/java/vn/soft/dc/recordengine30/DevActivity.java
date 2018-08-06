@@ -1,6 +1,7 @@
 package vn.soft.dc.recordengine30;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -31,8 +32,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,12 +42,11 @@ import vn.soft.dc.recordengine30.popup.PopupChoosePresetFragment;
 
 import static android.widget.Toast.LENGTH_SHORT;
 import static vn.soft.dc.recordengine.model.Preset.REVERB_LOW_CUT;
-import static vn.soft.dc.recordengine.util.FileUtils.readRawTextFile;
 import static vn.soft.dc.recordengine30.AudioControllerActivity.REVERB_PREDELAY;
 
+@SuppressWarnings({"unused", "ResultOfMethodCallIgnored", "ConstantConditions"})
 public class DevActivity extends AppCompatActivity {
     private static final int PERMISSION_CODE = 100;
-
 
     static int REVERB_NON = 0;
     static int REVERB_DRY = 1;
@@ -225,18 +223,16 @@ public class DevActivity extends AppCompatActivity {
     RelativeLayout lowCutContainer;
     @BindView(R.id.btnEffect)
     TextView btnEffect;
+    @BindView(R.id.btnBack)
+    TextView btnBack;
 
 
     private RecorderEngine mRecorderEngine;
-    private List<Preset> mPresets;
-    private Gson gson;
     private boolean isEnable;
-    private Handler handler;
 
     public static void start(AppCompatActivity activity) {
         Intent intent = new Intent(activity.getApplicationContext(), DevActivity.class);
         activity.startActivity(intent);
-        activity.finish();
     }
 
     @Override
@@ -258,18 +254,9 @@ public class DevActivity extends AppCompatActivity {
         requestPermission(PERMISSION_CODE, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
     }
 
+    @SuppressLint("SetTextI18n")
     private void doCreate() {
-        gson = new Gson();
-        mPresets = new ArrayList<>();
-        mPresets.add(gson.fromJson(readRawTextFile(getApplicationContext(), R.raw.acoustic), Preset.class));
-        mPresets.add(gson.fromJson(readRawTextFile(getApplicationContext(), R.raw.bolero), Preset.class));
-        mPresets.add(gson.fromJson(readRawTextFile(getApplicationContext(), R.raw.master), Preset.class));
-        mPresets.add(gson.fromJson(readRawTextFile(getApplicationContext(), R.raw.pop_star), Preset.class));
-        mPresets.add(gson.fromJson(readRawTextFile(getApplicationContext(), R.raw.pop_star_fix), Preset.class));
-        mPresets.add(gson.fromJson(readRawTextFile(getApplicationContext(), R.raw.rap), Preset.class));
-        mPresets.add(gson.fromJson(readRawTextFile(getApplicationContext(), R.raw.studio), Preset.class));
-
-        String samplerateString = null, buffersizeString = null;
+        String samplerateString, buffersizeString = null;
         if (Build.VERSION.SDK_INT >= 17) {
             AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
             buffersizeString = audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
@@ -278,6 +265,7 @@ public class DevActivity extends AppCompatActivity {
         if (buffersizeString == null) buffersizeString = "512";
 
         Log.d("ChungLD", buffersizeString);
+        tvInfo.setText("SampleRate: " + samplerateString + "; BufferSize: " + buffersizeString);
         mRecorderEngine = new RecorderEngine(Integer.parseInt(samplerateString), Integer.parseInt(buffersizeString));
         mRecorderEngine.setOnRecordEventListener(onRecordEventListener);
         isEnable = true;
@@ -286,7 +274,7 @@ public class DevActivity extends AppCompatActivity {
     }
 
     private void initViewControl() {
-        handler = new Handler();
+        Handler handler = new Handler();
         // fx select event
         reverbDry.setProgress(50);
         reverbDry.setOnSeekBarChangeListener(seekBarChangeListener);
@@ -469,6 +457,7 @@ public class DevActivity extends AppCompatActivity {
         }
     };
 
+    @SuppressLint("SetTextI18n")
     private void updateValueCompressor() {
         float compThreshold, compRatio, compRelease, compAttack, compWet;
         int compHP;
@@ -505,6 +494,7 @@ public class DevActivity extends AppCompatActivity {
 
 
     private SeekBar.OnSeekBarChangeListener onEQChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @SuppressLint("SetTextI18n")
         @Override
         public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
             tvBandBass.setText("Bass: " + sbBass.getProgress() / 10.0f);
@@ -524,6 +514,7 @@ public class DevActivity extends AppCompatActivity {
         }
     };
     private SeekBar.OnSeekBarChangeListener seekBarEchoChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @SuppressLint("SetTextI18n")
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             float dry = 1.0f * sbDryEcho.getProgress() / 100;
@@ -593,6 +584,7 @@ public class DevActivity extends AppCompatActivity {
 //    };
 
     private SeekBar.OnSeekBarChangeListener seekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @SuppressLint("SetTextI18n")
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             int id = seekBar.getId();
@@ -674,10 +666,7 @@ public class DevActivity extends AppCompatActivity {
     }
 
     public boolean isPermissionGranted(String permissions) {
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions) != PackageManager.PERMISSION_GRANTED) {
-            return false;
-        }
-        return true;
+        return ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions) == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
@@ -686,7 +675,7 @@ public class DevActivity extends AppCompatActivity {
         claimPermission();
     }
 
-    @OnClick({R.id.btnEnable, R.id.btnSave, R.id.btnEffect})
+    @OnClick({R.id.btnEnable, R.id.btnSave, R.id.btnEffect, R.id.btnBack})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btnEnable:
@@ -698,7 +687,15 @@ public class DevActivity extends AppCompatActivity {
             case R.id.btnEffect:
                 chooseEffect();
                 break;
+            case R.id.btnBack:
+                DevActivity.this.finish();
+                break;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+
     }
 
     private void chooseEffect() {
@@ -734,7 +731,7 @@ public class DevActivity extends AppCompatActivity {
         sbAttackCompressor.setProgress((int) (preset.getAttackCompressor() * 10000 - 1));
         sbRatioCompressor.setProgress((int) (preset.getRatioCompressor() * 10 - 15));
         sbThresHoldCompressor.setProgress((int) (0 - preset.getThresholdCompressor()));
-        sbHpCutCompressor.setProgress((int) (preset.getHpCut() - 1));
+        sbHpCutCompressor.setProgress(preset.getHpCut() - 1);
         sbReleaseSecondCompressor.setProgress((int) (preset.getReleaseCompressor() * 10 - 1));
 
 //        sbValue0.setProgress((int) (preset.getValueEQ0() + 24));
@@ -772,7 +769,20 @@ public class DevActivity extends AppCompatActivity {
     private void enableButtonClicked() {
         mRecorderEngine.enablePlayback(isEnable = !isEnable);
         btnEnable.setText(getString(isEnable ? R.string.turn_off_mic : R.string.k_ch_ho_t_microphone));
+        btnEnable.setTextColor(getResources().getColor(isEnable ? R.color.colorAccent : R.color.colorPrimary));
     }
 
+    @Override
+    protected void onStop() {
+        mRecorderEngine.enablePlayback(false);
+        super.onStop();
+    }
 
+    @Override
+    protected void onDestroy() {
+        if (mRecorderEngine != null) {
+            mRecorderEngine.release();
+        }
+        super.onDestroy();
+    }
 }

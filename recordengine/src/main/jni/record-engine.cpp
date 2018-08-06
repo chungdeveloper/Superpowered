@@ -66,11 +66,11 @@ RecordEngine::process(short int *audioInputOutput, unsigned int numberOfSamples,
 ////            recorder->setSamplerate(sampleRate);
 //            recorder->process(recordBufferFloat, numberOfSamples);
 //        }
-    reverb->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
-    compressor->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
 //    nBandEQ->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
-    echo->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
     threeBandEQ->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
+    reverb->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
+    echo->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
+    compressor->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
 
     SuperpoweredFloatToShortInt(inputBufferFloat, audioInputOutput, numberOfSamples);
 //        fifoOutputFirstSample += numberOfSamples;
@@ -251,6 +251,9 @@ void RecordEngine::onBandValues(float low, float mid, float high) {
     threeBandEQ->bands[2] = high;
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+
 void RecordEngine::onProcessBandEQ(float value0, float value1, float value2, float value3,
                                    float value4, float value5, float value6, float value7,
                                    float value8, float value9) {
@@ -266,6 +269,8 @@ void RecordEngine::onProcessBandEQ(float value0, float value1, float value2, flo
 //    nBandEQ->setBand(8, value8);
 //    nBandEQ->setBand(9, value9);
 }
+
+#pragma clang diagnostic pop
 
 void RecordEngine::enableEffect(bool enable) {
     reverb->enable(enable);
@@ -453,8 +458,11 @@ Java_vn_soft_dc_recordengine_RecorderEngine_enablePlayback(JNIEnv *env, jobject 
 #pragma clang diagnostic pop
 
 extern "C"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
 JNIEXPORT void
 Java_vn_soft_dc_recordengine_RecorderEngine_onCompressEnable(JNIEnv *env, jobject instance,
                                                              jboolean b) {
     executeProcess->enableCompressor(b);
 }
+#pragma clang diagnostic pop

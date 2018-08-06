@@ -10,5 +10,7 @@
     <string name="c_i_t_hi_u_ng">Cài đặt hiệu ứng</string>
     <string name="k_ch_ho_t_microphone">Kích hoạt Microphone</string>
     <string name="turn_off_mic">Tắt Microphone</string>
+    <string name="quay_l_i">Quay lại</string>
+    <string name="l_u_preset">Lưu preset</string>
 
 </resources>

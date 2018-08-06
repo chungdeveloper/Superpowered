@@ -35,6 +35,7 @@ public class RecorderEngine {
     }
 
     public RecorderEngine(int sampleRate, int bufferSize) {
+        bufferSize = bufferSize < 32 ? bufferSize : 32;
 //        System.loadLibrary(LIB_CPP);
         mAudioCalculator = new AudioCalculator();
         FrequencyDomainWithRecorder(createFileDirectory(RECORD_URI.MUSIC_TV_360_DIRECTORY_TEMP) + System.currentTimeMillis() + ".wav", sampleRate, bufferSize);
@@ -43,6 +44,7 @@ public class RecorderEngine {
     @SuppressWarnings("unused")
     public RecorderEngine(int sampleRate, int bufferSize, OnRecordEventListener onRecordEventListener) {
 //        System.loadLibrary(LIB_CPP);
+        bufferSize = bufferSize < 32 ? bufferSize : 32;
         mAudioCalculator = new AudioCalculator();
         this.onRecordEventListener = onRecordEventListener;
         FrequencyDomainWithRecorder(createFileDirectory(RECORD_URI.MUSIC_TV_360_DIRECTORY_TEMP) + System.currentTimeMillis() + ".wav", sampleRate, bufferSize);

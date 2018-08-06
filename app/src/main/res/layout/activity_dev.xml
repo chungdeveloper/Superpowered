@@ -1,87 +1,329 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true"
-    android:padding="10dp"
-    android:scrollbars="none"
+    android:orientation="vertical"
     tools:context=".DevActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="20dp">
+        android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/tvInfo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/colorPrimary"
-            android:textSize="13sp" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="@color/colorPrimary" />
-
-        <TextView
-            android:id="@+id/btnEnable"
-            android:layout_width="match_parent"
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="center"
             android:padding="10dp"
-            android:text="@string/k_ch_ho_t_microphone"
+            android:text="@string/quay_l_i"
             android:textColor="@color/colorPrimary"
-            android:textSize="13sp" />
+            android:textSize="13sp"
+            android:textStyle="bold" />
+    </LinearLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="@color/colorPrimary" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/colorAccent" />
 
-        <TextView
-            android:id="@+id/btnEffect"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:padding="10dp"
-            android:text="Hiệu ứng"
-            android:textColor="@color/colorPrimary"
-            android:textSize="13sp" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="@color/colorPrimary" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:scrollbars="none">
 
         <LinearLayout
-            android:id="@+id/rlEcho"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="20dp">
 
-            <RelativeLayout
+            <TextView
+                android:id="@+id/tvInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/fxFader"
+                android:gravity="center"
+                android:textColor="@color/colorPrimary"
+                android:textSize="13sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/colorPrimary" />
+
+            <TextView
+                android:id="@+id/btnEnable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="@string/k_ch_ho_t_microphone"
+                android:textColor="@color/colorPrimary"
+                android:textSize="13sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/colorPrimary" />
+
+            <TextView
+                android:id="@+id/btnEffect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="Hiệu ứng"
+                android:textColor="@color/colorPrimary"
+                android:textSize="13sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/colorPrimary" />
+
+            <LinearLayout
+                android:id="@+id/rlEcho"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/fxFader"
+                    android:layout_marginTop="15dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/dryEcho"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:text="Dry Echo"
+                        android:textColor="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/dry_valueEcho"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:text="0.50"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
+
+                    <SeekBar
+                        android:id="@+id/sbDryEcho"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@id/dryEcho"
+                        android:layout_marginTop="5dp"
+                        android:max="100" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/wet_containerEcho"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/wetEcho"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:text="Wet"
+                        android:textColor="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/wet_valueEcho"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:text="0.00"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
+
+                    <SeekBar
+                        android:id="@+id/sbWetEcho"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@id/wetEcho"
+                        android:layout_marginTop="5dp"
+                        android:max="100" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/width_containerEcho"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/wet_container"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/widthEcho"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:text="bpm"
+                        android:textColor="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/bpmValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:text="0.00"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
+
+                    <SeekBar
+                        android:id="@+id/sbBpm"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@id/widthEcho"
+                        android:layout_marginTop="5dp"
+                        android:max="180" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/roomsize_containerEcho"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/width_container"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/roomsizeEcho"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:text="beats"
+                        android:textColor="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/beatValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:text="0.00"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
+
+                    <SeekBar
+                        android:id="@+id/sbBeatsEcho"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@id/roomsizeEcho"
+                        android:layout_marginTop="5dp"
+                        android:max="1875" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/mix_containerEcho"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/roomsize_container"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/mixEcho"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:text="mix"
+                        android:textColor="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/mixEchoValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:text="0.00"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
+
+                    <SeekBar
+                        android:id="@+id/sbEchoMix"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@id/mixEcho"
+                        android:layout_marginTop="5dp"
+                        android:max="100" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/damp_containerEcho"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/mix_container"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/decayEcho"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:text="decay"
+                        android:textColor="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/decayEchoValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:text="0.00"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
+
+                    <SeekBar
+                        android:id="@+id/sbDecayEcho"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@id/decayEcho"
+                        android:layout_marginTop="5dp"
+                        android:max="100" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/reverbTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/rlEcho"
+                android:text="Reverb"
+                android:textColor="@color/colorPrimary" />
+
+            <RelativeLayout
+                android:id="@+id/dry_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/reverbTitle"
                 android:layout_marginTop="15dp"
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/dryEcho"
+                    android:id="@+id/dryReverb"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:text="Dry Echo"
+                    android:text="Dry"
                     android:textColor="@android:color/black" />
 
                 <TextView
-                    android:id="@+id/dry_valueEcho"
+                    android:id="@+id/dry_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -90,23 +332,23 @@
                     android:textStyle="bold" />
 
                 <SeekBar
-                    android:id="@+id/sbDryEcho"
+                    android:id="@+id/reverb_dry"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:layout_below="@id/dryEcho"
-                    android:layout_marginTop="5dp"
-                    android:max="100" />
+                    android:layout_below="@id/dryReverb"
+                    android:layout_marginTop="5dp" />
             </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/wet_containerEcho"
+                android:id="@+id/wet_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/dry_container"
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/wetEcho"
+                    android:id="@+id/wet"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
@@ -114,7 +356,7 @@
                     android:textColor="@android:color/black" />
 
                 <TextView
-                    android:id="@+id/wet_valueEcho"
+                    android:id="@+id/wet_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -123,32 +365,31 @@
                     android:textStyle="bold" />
 
                 <SeekBar
-                    android:id="@+id/sbWetEcho"
+                    android:id="@+id/reverb_wet"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:layout_below="@id/wetEcho"
-                    android:layout_marginTop="5dp"
-                    android:max="100" />
+                    android:layout_below="@id/wet"
+                    android:layout_marginTop="5dp" />
             </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/width_containerEcho"
+                android:id="@+id/width_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/wet_container"
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/widthEcho"
+                    android:id="@+id/width"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:text="bpm"
+                    android:text="Width"
                     android:textColor="@android:color/black" />
 
                 <TextView
-                    android:id="@+id/bpmValue"
+                    android:id="@+id/width_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -157,32 +398,31 @@
                     android:textStyle="bold" />
 
                 <SeekBar
-                    android:id="@+id/sbBpm"
+                    android:id="@+id/reverb_width"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:layout_below="@id/widthEcho"
-                    android:layout_marginTop="5dp"
-                    android:max="180" />
+                    android:layout_below="@id/width"
+                    android:layout_marginTop="5dp" />
             </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/roomsize_containerEcho"
+                android:id="@+id/roomsize_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/width_container"
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/roomsizeEcho"
+                    android:id="@+id/roomsize"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:text="beats"
+                    android:text="Roomsize"
                     android:textColor="@android:color/black" />
 
                 <TextView
-                    android:id="@+id/beatValue"
+                    android:id="@+id/roomsize_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -191,32 +431,31 @@
                     android:textStyle="bold" />
 
                 <SeekBar
-                    android:id="@+id/sbBeatsEcho"
+                    android:id="@+id/reverb_roomsize"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:layout_below="@id/roomsizeEcho"
-                    android:layout_marginTop="5dp"
-                    android:max="1875" />
+                    android:layout_below="@id/roomsize"
+                    android:layout_marginTop="5dp" />
             </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/mix_containerEcho"
+                android:id="@+id/mix_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/roomsize_container"
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/mixEcho"
+                    android:id="@+id/mix"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:text="mix"
+                    android:text="Mix"
                     android:textColor="@android:color/black" />
 
                 <TextView
-                    android:id="@+id/mixEchoValue"
+                    android:id="@+id/mix_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -225,32 +464,31 @@
                     android:textStyle="bold" />
 
                 <SeekBar
-                    android:id="@+id/sbEchoMix"
+                    android:id="@+id/reverb_mix"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:layout_below="@id/mixEcho"
-                    android:layout_marginTop="5dp"
-                    android:max="100" />
+                    android:layout_below="@id/mix"
+                    android:layout_marginTop="5dp" />
             </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/damp_containerEcho"
+                android:id="@+id/damp_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/mix_container"
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/decayEcho"
+                    android:id="@+id/damp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:text="decay"
+                    android:text="Damp"
                     android:textColor="@android:color/black" />
 
                 <TextView
-                    android:id="@+id/decayEchoValue"
+                    android:id="@+id/damp_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -259,482 +497,281 @@
                     android:textStyle="bold" />
 
                 <SeekBar
-                    android:id="@+id/sbDecayEcho"
+                    android:id="@+id/reverb_damp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:layout_below="@id/decayEcho"
-                    android:layout_marginTop="5dp"
-                    android:max="100" />
+                    android:layout_below="@id/damp"
+                    android:layout_marginTop="5dp" />
             </RelativeLayout>
-        </LinearLayout>
 
-        <TextView
-            android:id="@+id/reverbTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/rlEcho"
-            android:text="Reverb"
-            android:textColor="@color/colorPrimary" />
-
-        <RelativeLayout
-            android:id="@+id/dry_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/reverbTitle"
-            android:layout_marginTop="15dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/dryReverb"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:text="Dry"
-                android:textColor="@android:color/black" />
-
-            <TextView
-                android:id="@+id/dry_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:text="0.50"
-                android:textColor="@android:color/black"
-                android:textStyle="bold" />
-
-            <SeekBar
-                android:id="@+id/reverb_dry"
+            <RelativeLayout
+                android:id="@+id/predelay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@id/dryReverb"
-                android:layout_marginTop="5dp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/wet_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/dry_container"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/wet"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:text="Wet"
-                android:textColor="@android:color/black" />
-
-            <TextView
-                android:id="@+id/wet_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:text="0.00"
-                android:textColor="@android:color/black"
-                android:textStyle="bold" />
-
-            <SeekBar
-                android:id="@+id/reverb_wet"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@id/wet"
-                android:layout_marginTop="5dp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/width_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/wet_container"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/width"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:text="Width"
-                android:textColor="@android:color/black" />
-
-            <TextView
-                android:id="@+id/width_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:text="0.00"
-                android:textColor="@android:color/black"
-                android:textStyle="bold" />
-
-            <SeekBar
-                android:id="@+id/reverb_width"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@id/width"
-                android:layout_marginTop="5dp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/roomsize_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/width_container"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/roomsize"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:text="Roomsize"
-                android:textColor="@android:color/black" />
-
-            <TextView
-                android:id="@+id/roomsize_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:text="0.00"
-                android:textColor="@android:color/black"
-                android:textStyle="bold" />
-
-            <SeekBar
-                android:id="@+id/reverb_roomsize"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@id/roomsize"
-                android:layout_marginTop="5dp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/mix_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/roomsize_container"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/mix"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:text="Mix"
-                android:textColor="@android:color/black" />
-
-            <TextView
-                android:id="@+id/mix_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:text="0.00"
-                android:textColor="@android:color/black"
-                android:textStyle="bold" />
-
-            <SeekBar
-                android:id="@+id/reverb_mix"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@id/mix"
-                android:layout_marginTop="5dp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/damp_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/mix_container"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/damp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:text="Damp"
-                android:textColor="@android:color/black" />
-
-            <TextView
-                android:id="@+id/damp_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:text="0.00"
-                android:textColor="@android:color/black"
-                android:textStyle="bold" />
-
-            <SeekBar
-                android:id="@+id/reverb_damp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@id/damp"
-                android:layout_marginTop="5dp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/predelay"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/damp_container"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/damp1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:text="Pre-Delay"
-                android:textColor="@android:color/black" />
-
-            <TextView
-                android:id="@+id/predelay_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:text="0.00"
-                android:textColor="@android:color/black"
-                android:textStyle="bold" />
-
-            <SeekBar
-                android:id="@+id/sbPredelay"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@id/damp1"
-                android:layout_marginTop="5dp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/lowCutContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/predelay"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/damp12"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:text="Low cut Hz"
-                android:textColor="@android:color/black" />
-
-            <TextView
-                android:id="@+id/lowCutReverb"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:text="0.00"
-                android:textColor="@android:color/black"
-                android:textStyle="bold" />
-
-            <SeekBar
-                android:id="@+id/sbLowcutHzReverb"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@id/damp12"
-                android:layout_marginTop="5dp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/layoutCompressor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/damp_container">
-
-            <TextView
-                android:id="@+id/tvCompressor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/cbCompressorEnable"
-                android:layout_alignTop="@id/cbCompressorEnable"
-                android:gravity="center_vertical"
-                android:text="Compressor"
-                android:textColor="@android:color/black" />
-
-            <CheckBox
-                android:id="@+id/cbCompressorEnable"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/tvCompressor"
-                android:checked="true" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/cbCompressorEnable"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_below="@+id/damp_container"
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tvCompWet"
+                    android:id="@+id/damp1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Dry - Wet ratio: 1.0"
+                    android:layout_alignParentLeft="true"
+                    android:text="Pre-Delay"
                     android:textColor="@android:color/black" />
-
-                <SeekBar
-                    android:id="@+id/sbDryCompressor"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="100"
-                    android:progress="100" />
 
                 <TextView
-                    android:id="@+id/tvCompAttack"
+                    android:id="@+id/predelay_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Attack second: 0.003"
-                    android:textColor="@android:color/black" />
+                    android:layout_centerHorizontal="true"
+                    android:text="0.00"
+                    android:textColor="@android:color/black"
+                    android:textStyle="bold" />
 
                 <SeekBar
-                    android:id="@+id/sbAttackCompressor"
+                    android:id="@+id/sbPredelay"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:max="299"
-                    android:progress="29" />
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@id/damp1"
+                    android:layout_marginTop="5dp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/lowCutContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/predelay"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tvCompRelease"
+                    android:id="@+id/damp12"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Release second: 0.3"
+                    android:layout_alignParentLeft="true"
+                    android:text="Low cut Hz"
                     android:textColor="@android:color/black" />
-
-                <SeekBar
-                    android:id="@+id/sbReleaseSecondCompressor"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="15"
-                    android:progress="2" />
 
                 <TextView
-                    android:id="@+id/tvCompRatio"
+                    android:id="@+id/lowCutReverb"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ratio: 3.0"
-                    android:textColor="@android:color/black" />
+                    android:layout_centerHorizontal="true"
+                    android:text="0.00"
+                    android:textColor="@android:color/black"
+                    android:textStyle="bold" />
 
                 <SeekBar
-                    android:id="@+id/sbRatioCompressor"
+                    android:id="@+id/sbLowcutHzReverb"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:max="85"
-                    android:progress="15" />
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@id/damp12"
+                    android:layout_marginTop="5dp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/layoutCompressor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/damp_container">
 
                 <TextView
-                    android:id="@+id/tvCompThreshold"
+                    android:id="@+id/tvCompressor"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Threshold: 0"
+                    android:layout_alignBottom="@+id/cbCompressorEnable"
+                    android:layout_alignTop="@id/cbCompressorEnable"
+                    android:gravity="center_vertical"
+                    android:text="Compressor"
                     android:textColor="@android:color/black" />
 
-                <SeekBar
-                    android:id="@+id/sbThresHoldCompressor"
+                <CheckBox
+                    android:id="@+id/cbCompressorEnable"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/tvCompressor"
+                    android:checked="true" />
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:max="40"
-                    android:progress="0" />
+                    android:layout_below="@+id/cbCompressorEnable"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvCompWet"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Dry - Wet ratio: 1.0"
+                        android:textColor="@android:color/black" />
+
+                    <SeekBar
+                        android:id="@+id/sbDryCompressor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="100"
+                        android:progress="100" />
+
+                    <TextView
+                        android:id="@+id/tvCompAttack"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Attack second: 0.003"
+                        android:textColor="@android:color/black" />
+
+                    <SeekBar
+                        android:id="@+id/sbAttackCompressor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="299"
+                        android:progress="29" />
+
+                    <TextView
+                        android:id="@+id/tvCompRelease"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Release second: 0.3"
+                        android:textColor="@android:color/black" />
+
+                    <SeekBar
+                        android:id="@+id/sbReleaseSecondCompressor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="15"
+                        android:progress="2" />
+
+                    <TextView
+                        android:id="@+id/tvCompRatio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ratio: 3.0"
+                        android:textColor="@android:color/black" />
+
+                    <SeekBar
+                        android:id="@+id/sbRatioCompressor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="85"
+                        android:progress="15" />
+
+                    <TextView
+                        android:id="@+id/tvCompThreshold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Threshold: 0"
+                        android:textColor="@android:color/black" />
+
+                    <SeekBar
+                        android:id="@+id/sbThresHoldCompressor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="40"
+                        android:progress="0" />
+
+                    <TextView
+                        android:id="@+id/tvCompHP"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hp Cut: 1"
+                        android:textColor="@android:color/black" />
+
+                    <SeekBar
+                        android:id="@+id/sbHpCutCompressor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="9999"
+                        android:progress="0" />
+                </LinearLayout>
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/lnBandEQ"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/layoutCompressor"
+                android:layout_margin="10dp"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tvCompHP"
+                    android:id="@+id/tvBandBass"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Hp Cut: 1"
+                    android:text="Bass: 1.0"
                     android:textColor="@android:color/black" />
 
                 <SeekBar
-                    android:id="@+id/sbHpCutCompressor"
+                    android:id="@+id/sbBass"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:max="9999"
-                    android:progress="0" />
+                    android:max="50"
+                    android:progress="10" />
+
+                <TextView
+                    android:id="@+id/tvBandMid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mid: 1.0"
+                    android:textColor="@android:color/black" />
+
+                <SeekBar
+                    android:id="@+id/sbMid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="50"
+                    android:progress="10" />
+
+                <TextView
+                    android:id="@+id/tvBandHi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="High: 1.0"
+                    android:textColor="@android:color/black" />
+
+                <SeekBar
+                    android:id="@+id/sbHi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="50"
+                    android:progress="10" />
             </LinearLayout>
-        </RelativeLayout>
 
-        <LinearLayout
-            android:id="@+id/lnBandEQ"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/layoutCompressor"
-            android:layout_margin="10dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tvBandBass"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Bass: 1.0"
-                android:textColor="@android:color/black" />
-
-            <SeekBar
-                android:id="@+id/sbBass"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:max="50"
-                android:progress="10" />
+                android:layout_below="@+id/lnBandEQ"
+                android:layout_marginTop="10dp">
 
-            <TextView
-                android:id="@+id/tvBandMid"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Mid: 1.0"
-                android:textColor="@android:color/black" />
+                <EditText
+                    android:id="@+id/etName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:hint="Nhập tên preset"
+                    android:padding="10dp"
+                    android:singleLine="true"
+                    android:textColor="@android:color/black"
+                    android:textSize="13sp" />
 
-            <SeekBar
-                android:id="@+id/sbMid"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="50"
-                android:progress="10" />
+                <TextView
+                    android:id="@+id/btnSave"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/etName"
+                    android:layout_marginTop="5dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="@string/l_u_preset"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
 
-            <TextView
-                android:id="@+id/tvBandHi"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="High: 1.0"
-                android:textColor="@android:color/black" />
-
-            <SeekBar
-                android:id="@+id/sbHi"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="50"
-                android:progress="10" />
         </LinearLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/lnBandEQ"
-            android:layout_marginTop="10dp">
-
-            <EditText
-                android:id="@+id/etName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:hint="Nhập tên preset"
-                android:padding="10dp"
-                android:singleLine="true"
-                android:textColor="@android:color/black"
-                android:textSize="13sp" />
-
-            <Button
-                android:id="@+id/btnSave"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/etName"
-                android:layout_marginTop="5dp"
-                android:text="Lưu preset" />
-        </RelativeLayout>
-
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</LinearLayout>
