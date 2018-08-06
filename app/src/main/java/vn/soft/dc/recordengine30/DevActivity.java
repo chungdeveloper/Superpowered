@@ -2,6 +2,7 @@ package vn.soft.dc.recordengine30;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.os.Build;
@@ -27,6 +28,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,9 +39,12 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import vn.soft.dc.recordengine.RecorderEngine;
 import vn.soft.dc.recordengine.model.Preset;
+import vn.soft.dc.recordengine30.popup.PopupChoosePresetFragment;
 
 import static android.widget.Toast.LENGTH_SHORT;
+import static vn.soft.dc.recordengine.model.Preset.REVERB_LOW_CUT;
 import static vn.soft.dc.recordengine.util.FileUtils.readRawTextFile;
+import static vn.soft.dc.recordengine30.AudioControllerActivity.REVERB_PREDELAY;
 
 public class DevActivity extends AppCompatActivity {
     private static final int PERMISSION_CODE = 100;
@@ -52,7 +57,10 @@ public class DevActivity extends AppCompatActivity {
     static int REVERB_MIX = 4;
     static int REVERB_ROOMSIZE = 5;
     static int REVERB_DAMP = 6;
-
+    @BindView(R.id.tvInfo)
+    TextView tvInfo;
+    @BindView(R.id.btnEnable)
+    TextView btnEnable;
     @BindView(R.id.dryEcho)
     TextView dryEcho;
     @BindView(R.id.dry_valueEcho)
@@ -195,58 +203,41 @@ public class DevActivity extends AppCompatActivity {
     SeekBar sbHi;
     @BindView(R.id.lnBandEQ)
     LinearLayout lnBandEQ;
-    @BindView(R.id.value0)
-    TextView value0;
-    @BindView(R.id.sbValue0)
-    SeekBar sbValue0;
-    @BindView(R.id.value1)
-    TextView value1;
-    @BindView(R.id.sbValue1)
-    SeekBar sbValue1;
-    @BindView(R.id.value2)
-    TextView value2;
-    @BindView(R.id.sbValue2)
-    SeekBar sbValue2;
-    @BindView(R.id.value3)
-    TextView value3;
-    @BindView(R.id.sbValue3)
-    SeekBar sbValue3;
-    @BindView(R.id.value4)
-    TextView value4;
-    @BindView(R.id.sbValue4)
-    SeekBar sbValue4;
-    @BindView(R.id.value5)
-    TextView value5;
-    @BindView(R.id.sbValue5)
-    SeekBar sbValue5;
-    @BindView(R.id.value6)
-    TextView value6;
-    @BindView(R.id.sbValue6)
-    SeekBar sbValue6;
-    @BindView(R.id.value7)
-    TextView value7;
-    @BindView(R.id.sbValue7)
-    SeekBar sbValue7;
-    @BindView(R.id.value8)
-    TextView value8;
-    @BindView(R.id.sbValue8)
-    SeekBar sbValue8;
-    @BindView(R.id.value9)
-    TextView value9;
-    @BindView(R.id.sbValue9)
-    SeekBar sbValue9;
-    @BindView(R.id.panel_n_band_eq)
-    LinearLayout panelNBandEq;
     @BindView(R.id.etName)
     EditText etName;
     @BindView(R.id.btnSave)
     Button btnSave;
+    @BindView(R.id.damp1)
+    TextView damp1;
+    @BindView(R.id.predelay_value)
+    TextView predelayValue;
+    @BindView(R.id.sbPredelay)
+    SeekBar sbPredelay;
+    @BindView(R.id.predelay)
+    RelativeLayout predelay;
+    @BindView(R.id.damp12)
+    TextView damp12;
+    @BindView(R.id.lowCutReverb)
+    TextView lowCutReverb;
+    @BindView(R.id.sbLowcutHzReverb)
+    SeekBar sbLowcutHzReverb;
+    @BindView(R.id.lowCutContainer)
+    RelativeLayout lowCutContainer;
+    @BindView(R.id.btnEffect)
+    TextView btnEffect;
+
 
     private RecorderEngine mRecorderEngine;
     private List<Preset> mPresets;
     private Gson gson;
     private boolean isEnable;
     private Handler handler;
+
+    public static void start(AppCompatActivity activity) {
+        Intent intent = new Intent(activity.getApplicationContext(), DevActivity.class);
+        activity.startActivity(intent);
+        activity.finish();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -289,10 +280,8 @@ public class DevActivity extends AppCompatActivity {
         Log.d("ChungLD", buffersizeString);
         mRecorderEngine = new RecorderEngine(Integer.parseInt(samplerateString), Integer.parseInt(buffersizeString));
         mRecorderEngine.setOnRecordEventListener(onRecordEventListener);
-        isEnable = false;
-//        btnEnable.setText(isEnable ? "Đang hoạt động" : "Đã vô hiệu hóa");
-
-
+        isEnable = true;
+        enableButtonClicked();
         initViewControl();
     }
 
@@ -311,73 +300,43 @@ public class DevActivity extends AppCompatActivity {
         reverbRoomsize.setOnSeekBarChangeListener(seekBarChangeListener);
         reverbDamp.setProgress(0);
         reverbDamp.setOnSeekBarChangeListener(seekBarChangeListener);
+        sbPredelay.setProgress(0);
+        sbPredelay.setOnSeekBarChangeListener(seekBarChangeListener);
+        sbLowcutHzReverb.setProgress(0);
+        sbLowcutHzReverb.setOnSeekBarChangeListener(seekBarChangeListener);
 
-        sbValue0 = (SeekBar) findViewById(R.id.sbValue0);
-        sbValue0.setOnSeekBarChangeListener(onNBandEQChangeListener);
-        sbValue1 = (SeekBar) findViewById(R.id.sbValue1);
-        sbValue1.setOnSeekBarChangeListener(onNBandEQChangeListener);
-        sbValue2 = (SeekBar) findViewById(R.id.sbValue2);
-        sbValue2.setOnSeekBarChangeListener(onNBandEQChangeListener);
-        sbValue3 = (SeekBar) findViewById(R.id.sbValue3);
-        sbValue3.setOnSeekBarChangeListener(onNBandEQChangeListener);
-        sbValue4 = (SeekBar) findViewById(R.id.sbValue4);
-        sbValue4.setOnSeekBarChangeListener(onNBandEQChangeListener);
-        sbValue5 = (SeekBar) findViewById(R.id.sbValue5);
-        sbValue5.setOnSeekBarChangeListener(onNBandEQChangeListener);
-        sbValue6 = (SeekBar) findViewById(R.id.sbValue6);
-        sbValue6.setOnSeekBarChangeListener(onNBandEQChangeListener);
-        sbValue7 = (SeekBar) findViewById(R.id.sbValue7);
-        sbValue7.setOnSeekBarChangeListener(onNBandEQChangeListener);
-        sbValue8 = (SeekBar) findViewById(R.id.sbValue8);
-        sbValue8.setOnSeekBarChangeListener(onNBandEQChangeListener);
-        sbValue9 = (SeekBar) findViewById(R.id.sbValue9);
-        sbValue9.setOnSeekBarChangeListener(onNBandEQChangeListener);
+//        sbValue0.setOnSeekBarChangeListener(onNBandEQChangeListener);
+//        sbValue1.setOnSeekBarChangeListener(onNBandEQChangeListener);
+//        sbValue2.setOnSeekBarChangeListener(onNBandEQChangeListener);
+//        sbValue3.setOnSeekBarChangeListener(onNBandEQChangeListener);
+//        sbValue4.setOnSeekBarChangeListener(onNBandEQChangeListener);
+//        sbValue5.setOnSeekBarChangeListener(onNBandEQChangeListener);
+//        sbValue6.setOnSeekBarChangeListener(onNBandEQChangeListener);
+//        sbValue7.setOnSeekBarChangeListener(onNBandEQChangeListener);
+//        sbValue8.setOnSeekBarChangeListener(onNBandEQChangeListener);
+//        sbValue9.setOnSeekBarChangeListener(onNBandEQChangeListener);
         // echo events
-        sbDryEcho = (SeekBar) findViewById(R.id.sbDryEcho);
         sbDryEcho.setProgress(50);
         sbDryEcho.setOnSeekBarChangeListener(seekBarEchoChangeListener);
 
-        sbWetEcho = (SeekBar) findViewById(R.id.sbWetEcho);
         sbWetEcho.setProgress(0);
         sbWetEcho.setOnSeekBarChangeListener(seekBarEchoChangeListener);
 
-        sbDecayEcho = (SeekBar) findViewById(R.id.sbDecayEcho);
         sbDecayEcho.setProgress(0);
         sbDecayEcho.setOnSeekBarChangeListener(seekBarEchoChangeListener);
 
-        sbBpm = (SeekBar) findViewById(R.id.sbBpm);
         sbBpm.setProgress(0);
         sbBpm.setOnSeekBarChangeListener(seekBarEchoChangeListener);
 
-        sbBeatsEcho = (SeekBar) findViewById(R.id.sbBeatsEcho);
         sbBeatsEcho.setProgress(0);
         sbBeatsEcho.setOnSeekBarChangeListener(seekBarEchoChangeListener);
 
-        sbEchoMix = (SeekBar) findViewById(R.id.sbEchoMix);
         sbEchoMix.setProgress(0);
         sbEchoMix.setOnSeekBarChangeListener(seekBarEchoChangeListener);
 
         initCompressorView();
         initThreeBandEQView();
 
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                saveData();
-            }
-        });
-
-//        btnPresetChoose.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                PopupChoosePresetFragment.newInstance().setOnPresetChoose(new PopupChoosePresetFragment.OnPresetChoose() {
-//                    @Override
-//                    public void onChoose(Preset preset) {
-//                        onProcessPresetChoose(new Gson().fromJson(mReadJsonData(preset.getName()), Preset.class));
-//                    }
-//                }).show(getSupportFragmentManager(), null);
-//            }
-//        });
     }
 
     private void saveData() {
@@ -401,6 +360,8 @@ public class DevActivity extends AppCompatActivity {
         preset.setDampReverb(convertStringToFloat(dampValue));
         preset.setRoomsizeReverb(convertStringToFloat(roomsizeValue));
         preset.setWidthReverb(convertStringToFloat(widthValue));
+        preset.setLowcutReverb(convertStringToFloat(lowCutReverb));
+        preset.setPreDelay(convertStringToFloat(predelayValue));
 
         preset.setDryCompressor(convertStringToFloat(tvCompWet.getText().toString().replace("Dry - Wet ratio: ", "")));
         preset.setAttackCompressor(convertStringToFloat(tvCompAttack.getText().toString().replace("Attack second: ", "")));
@@ -414,16 +375,16 @@ public class DevActivity extends AppCompatActivity {
         preset.setMid(convertStringToFloat(tvBandMid.getText().toString().replace("Mid: ", "")));
         preset.setHi(convertStringToFloat(tvBandHi.getText().toString().replace("High: ", "")));
 
-        preset.setValueEQ0((sbValue0.getProgress() - 24));
-        preset.setValueEQ1((sbValue1.getProgress() - 24));
-        preset.setValueEQ2((sbValue2.getProgress() - 24));
-        preset.setValueEQ3((sbValue3.getProgress() - 24));
-        preset.setValueEQ4((sbValue4.getProgress() - 24));
-        preset.setValueEQ5((sbValue5.getProgress() - 24));
-        preset.setValueEQ6((sbValue6.getProgress() - 24));
-        preset.setValueEQ7((sbValue7.getProgress() - 24));
-        preset.setValueEQ8((sbValue8.getProgress() - 24));
-        preset.setValueEQ9((sbValue9.getProgress() - 24));
+//        preset.setValueEQ0((sbValue0.getProgress() - 24));
+//        preset.setValueEQ1((sbValue1.getProgress() - 24));
+//        preset.setValueEQ2((sbValue2.getProgress() - 24));
+//        preset.setValueEQ3((sbValue3.getProgress() - 24));
+//        preset.setValueEQ4((sbValue4.getProgress() - 24));
+//        preset.setValueEQ5((sbValue5.getProgress() - 24));
+//        preset.setValueEQ6((sbValue6.getProgress() - 24));
+//        preset.setValueEQ7((sbValue7.getProgress() - 24));
+//        preset.setValueEQ8((sbValue8.getProgress() - 24));
+//        preset.setValueEQ9((sbValue9.getProgress() - 24));
 
         preset.setName(etName.getText().toString().trim());
         String data = new Gson().toJson(preset);
@@ -485,6 +446,7 @@ public class DevActivity extends AppCompatActivity {
         cbCompressorEnable.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                mRecorderEngine.onCompressEnable(b);
                 Toast.makeText(getApplicationContext(), "Compressor enable: " + b, LENGTH_SHORT).show();
             }
         });
@@ -508,7 +470,6 @@ public class DevActivity extends AppCompatActivity {
     };
 
     private void updateValueCompressor() {
-
         float compThreshold, compRatio, compRelease, compAttack, compWet;
         int compHP;
 
@@ -540,10 +501,6 @@ public class DevActivity extends AppCompatActivity {
         sbBass.setOnSeekBarChangeListener(onEQChangeListener);
         sbMid.setOnSeekBarChangeListener(onEQChangeListener);
         sbHi.setOnSeekBarChangeListener(onEQChangeListener);
-
-        tvBandBass = (TextView) findViewById(R.id.tvBandBass);
-        tvBandMid = (TextView) findViewById(R.id.tvBandMid);
-        tvBandHi = (TextView) findViewById(R.id.tvBandHi);
     }
 
 
@@ -597,42 +554,43 @@ public class DevActivity extends AppCompatActivity {
         }
     };
 
-    private SeekBar.OnSeekBarChangeListener onNBandEQChangeListener = new SeekBar.OnSeekBarChangeListener() {
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            mRecorderEngine.onProcessBandEQ(((float) (sbValue0.getProgress() - 24))
-                    , ((float) (sbValue1.getProgress() - 24))
-                    , ((float) (sbValue2.getProgress() - 24))
-                    , ((float) (sbValue3.getProgress() - 24))
-                    , ((float) (sbValue4.getProgress() - 24))
-                    , ((float) (sbValue5.getProgress() - 24))
-                    , ((float) (sbValue6.getProgress() - 24))
-                    , ((float) (sbValue7.getProgress() - 24))
-                    , ((float) (sbValue8.getProgress() - 24))
-                    , ((float) (sbValue9.getProgress() - 24)));
-
-            value0.setText((sbValue0.getProgress() - 24) + " dB");
-            value1.setText((sbValue1.getProgress() - 24) + " dB");
-            value2.setText((sbValue2.getProgress() - 24) + " dB");
-            value3.setText((sbValue3.getProgress() - 24) + " dB");
-            value4.setText((sbValue4.getProgress() - 24) + " dB");
-            value5.setText((sbValue5.getProgress() - 24) + " dB");
-            value6.setText((sbValue6.getProgress() - 24) + " dB");
-            value7.setText((sbValue7.getProgress() - 24) + " dB");
-            value8.setText((sbValue8.getProgress() - 24) + " dB");
-            value9.setText((sbValue9.getProgress() - 24) + " dB");
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-
-        }
-    };
+//    private SeekBar.OnSeekBarChangeListener onNBandEQChangeListener = new SeekBar.OnSeekBarChangeListener() {
+//        @SuppressLint("SetTextI18n")
+//        @Override
+//        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+//            mRecorderEngine.onProcessBandEQ(((float) (sbValue0.getProgress() - 24))
+//                    , ((float) (sbValue1.getProgress() - 24))
+//                    , ((float) (sbValue2.getProgress() - 24))
+//                    , ((float) (sbValue3.getProgress() - 24))
+//                    , ((float) (sbValue4.getProgress() - 24))
+//                    , ((float) (sbValue5.getProgress() - 24))
+//                    , ((float) (sbValue6.getProgress() - 24))
+//                    , ((float) (sbValue7.getProgress() - 24))
+//                    , ((float) (sbValue8.getProgress() - 24))
+//                    , ((float) (sbValue9.getProgress() - 24)));
+//
+//            value0.setText((sbValue0.getProgress() - 24) + " dB");
+//            value1.setText((sbValue1.getProgress() - 24) + " dB");
+//            value2.setText((sbValue2.getProgress() - 24) + " dB");
+//            value3.setText((sbValue3.getProgress() - 24) + " dB");
+//            value4.setText((sbValue4.getProgress() - 24) + " dB");
+//            value5.setText((sbValue5.getProgress() - 24) + " dB");
+//            value6.setText((sbValue6.getProgress() - 24) + " dB");
+//            value7.setText((sbValue7.getProgress() - 24) + " dB");
+//            value8.setText((sbValue8.getProgress() - 24) + " dB");
+//            value9.setText((sbValue9.getProgress() - 24) + " dB");
+//        }
+//
+//        @Override
+//        public void onStartTrackingTouch(SeekBar seekBar) {
+//
+//        }
+//
+//        @Override
+//        public void onStopTrackingTouch(SeekBar seekBar) {
+//
+//        }
+//    };
 
     private SeekBar.OnSeekBarChangeListener seekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
@@ -664,6 +622,14 @@ public class DevActivity extends AppCompatActivity {
                 case R.id.reverb_damp:
                     mRecorderEngine.onFxReverbValue(REVERB_DAMP, valueF);
                     dampValue.setText(value);
+                    break;
+                case R.id.sbPredelay:
+                    mRecorderEngine.onFxReverbValue(REVERB_PREDELAY, progress * 1.0f);
+                    predelayValue.setText(progress + "");
+                    break;
+                case R.id.sbLowcutHzReverb:
+                    mRecorderEngine.onFxReverbValue(REVERB_LOW_CUT, progress * 1.0f);
+                    lowCutReverb.setText(progress + "");
                     break;
             }
         }
@@ -720,7 +686,93 @@ public class DevActivity extends AppCompatActivity {
         claimPermission();
     }
 
-    @OnClick(R.id.btnSave)
-    public void onViewClicked() {
+    @OnClick({R.id.btnEnable, R.id.btnSave, R.id.btnEffect})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.btnEnable:
+                enableButtonClicked();
+                break;
+            case R.id.btnSave:
+                saveData();
+                break;
+            case R.id.btnEffect:
+                chooseEffect();
+                break;
+        }
     }
+
+    private void chooseEffect() {
+        PopupChoosePresetFragment.newInstance().setOnPresetChoose(new PopupChoosePresetFragment.OnPresetChoose() {
+            @Override
+            public void onChoose(Preset preset) {
+                onProcessPresetChoose(new Gson().fromJson(mReadJsonData(preset.getName()), Preset.class));
+            }
+        }).show(getSupportFragmentManager(), null);
+    }
+
+    private void onProcessPresetChoose(Preset preset) {
+        String[] path = preset.getName().split("/");
+        btnEffect.setText(path[path.length - 1]);
+
+        reverbDry.setProgress((int) (preset.getDryReverb() * 100));
+        reverbWet.setProgress((int) (preset.getWetReverb() * 100));
+        reverbMix.setProgress((int) (preset.getMixReverb() * 100));
+        reverbWidth.setProgress((int) (preset.getWidthReverb() * 100));
+        reverbDamp.setProgress((int) (preset.getDampReverb() * 100));
+        sbLowcutHzReverb.setProgress((int) (preset.getLowcutReverb()));
+        sbPredelay.setProgress((int) (preset.getPreDelay()));
+        reverbRoomsize.setProgress((int) (preset.getRoomsizeReverb() * 100));
+
+        sbDryEcho.setProgress((int) (preset.getDryEcho() * 100));
+        sbWetEcho.setProgress((int) (preset.getWetEcho() * 100));
+        sbEchoMix.setProgress((int) (preset.getMixEcho() * 100));
+        sbDecayEcho.setProgress((int) (preset.getDecayEcho() * 100));
+        sbBeatsEcho.setProgress((int) (preset.getBeatsEcho() * 1000 - 125));
+        sbBpm.setProgress((int) (preset.getBpmEcho() - 60));
+
+        sbDryCompressor.setProgress((int) (preset.getDryCompressor() * 100));
+        sbAttackCompressor.setProgress((int) (preset.getAttackCompressor() * 10000 - 1));
+        sbRatioCompressor.setProgress((int) (preset.getRatioCompressor() * 10 - 15));
+        sbThresHoldCompressor.setProgress((int) (0 - preset.getThresholdCompressor()));
+        sbHpCutCompressor.setProgress((int) (preset.getHpCut() - 1));
+        sbReleaseSecondCompressor.setProgress((int) (preset.getReleaseCompressor() * 10 - 1));
+
+//        sbValue0.setProgress((int) (preset.getValueEQ0() + 24));
+//        sbValue1.setProgress((int) (preset.getValueEQ1() + 24));
+//        sbValue2.setProgress((int) (preset.getValueEQ2() + 24));
+//        sbValue3.setProgress((int) (preset.getValueEQ3() + 24));
+//        sbValue4.setProgress((int) (preset.getValueEQ4() + 24));
+//        sbValue5.setProgress((int) (preset.getValueEQ5() + 24));
+//        sbValue6.setProgress((int) (preset.getValueEQ6() + 24));
+//        sbValue7.setProgress((int) (preset.getValueEQ7() + 24));
+//        sbValue8.setProgress((int) (preset.getValueEQ8() + 24));
+//        sbValue9.setProgress((int) (preset.getValueEQ9() + 24));
+
+        sbBass.setProgress((int) (preset.getBass() * 10));
+        sbMid.setProgress((int) (preset.getMid() * 10));
+        sbHi.setProgress((int) (preset.getHi() * 10));
+    }
+
+    public String mReadJsonData(String path) {
+        try {
+            File f = new File(path);
+            FileInputStream is = new FileInputStream(f);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            return new String(buffer);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    private void enableButtonClicked() {
+        mRecorderEngine.enablePlayback(isEnable = !isEnable);
+        btnEnable.setText(getString(isEnable ? R.string.turn_off_mic : R.string.k_ch_ho_t_microphone));
+    }
+
+
 }

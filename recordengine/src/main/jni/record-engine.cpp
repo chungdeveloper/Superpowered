@@ -1,18 +1,11 @@
-#include "record-engine.h"
+#include <record-engine.h>
 #include <media-engine.h>
 #include <jni.h>
 #include <stdlib.h>
-#include <SuperpoweredSimple.h>
-#include <SuperpoweredCPU.h>
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_AndroidConfiguration.h>
 #include <string.h>
 #include <pthread.h>
-#include <SuperpoweredRecorder.h>
-#include <SuperpoweredCompressor.h>
-#include <Superpowered3BandEQ.h>
-#include <SuperpoweredReverb.h>
-#include <SuperpoweredNBandEQ.h>
 
 //=====================================RECORD MODULE================================================
 static RecordEngine *executeProcess = NULL;
@@ -27,49 +20,67 @@ static bool audioProcessing(void *__unused clientdata, short int *audioInputOutp
 bool
 RecordEngine::process(short int *audioInputOutput, unsigned int numberOfSamples,
                       unsigned int sampleRate) {
-    SuperpoweredShortIntToFloat(audioInputOutput, inputBufferFloat,
-                                numberOfSamples);
-    frequencyDomain->addInput(inputBufferFloat, numberOfSamples);
-    while (frequencyDomain->timeDomainToFrequencyDomain(magnitudeLeft, magnitudeRight, phaseLeft,
-                                                        phaseRight)) {
-        if (fifoOutputLastSample + stepSize >=
-            fifoCapacity) { // This will be true for every 100th iteration only, so we save precious memory bandwidth.
-            int samplesInFifo = fifoOutputLastSample - fifoOutputFirstSample;
-            if (samplesInFifo > 0)
-                memmove(fifoOutput, fifoOutput + fifoOutputFirstSample * 2,
-                        samplesInFifo * sizeof(float) * 2);
-            fifoOutputFirstSample = 0;
-            fifoOutputLastSample = samplesInFifo;
-        };
+    SuperpoweredShortIntToFloat(audioInputOutput, inputBufferFloat, numberOfSamples);
 
-        // Transforming back to the time domain.
-        frequencyDomain->frequencyDomainToTimeDomain(magnitudeLeft, magnitudeRight, phaseLeft,
-                                                     phaseRight,
-                                                     fifoOutput + fifoOutputLastSample * 2);
-        frequencyDomain->advance();
-        fifoOutputLastSample += stepSize;
-    };
+//    // Input goes to the frequency domain.
+//    frequencyDomain->addInput(inputBufferFloat, numberOfSamples);
+//
+//    // When FFT size is 2048, we have 1024 magnitude and phase bins
+//    // in the frequency domain for every channel.
+//    while (frequencyDomain->timeDomainToFrequencyDomain(magnitudeLeft, magnitudeRight, phaseLeft,
+//                                                        phaseRight)) {
+//        // You can work with frequency domain data from this point.
+//
+//        // This is just a quick example: we remove the magnitude of the first 20 bins,
+//        // meaning total bass cut between 0-430 Hz.
+//        memset(magnitudeLeft, 0, 24);
+//        memset(magnitudeRight, 0, 24);
+//
+//        // We are done working with frequency domain data. Let's go back to the time domain.
+//
+//        // Check if we have enough room in the fifo buffer for the output.
+//        // If not, move the existing audio data back to the buffer's beginning.
+//        if (fifoOutputLastSample + stepSize >= fifoCapacity) {
+//            // This will be true for every 100th iteration only,
+//            // so we save precious memory bandwidth.
+//            int samplesInFifo = fifoOutputLastSample - fifoOutputFirstSample;
+//            if (samplesInFifo > 0)memmove(fifoOutput, fifoOutput + fifoOutputFirstSample * 2, samplesInFifo * sizeof(float) * 2);
+//            fifoOutputFirstSample = 0;
+//            fifoOutputLastSample = samplesInFifo;
+//        };
+//
+//        // Transforming back to the time domain.
+//        frequencyDomain->frequencyDomainToTimeDomain(magnitudeLeft, magnitudeRight, phaseLeft,
+//                                                     phaseRight,
+//                                                     fifoOutput + fifoOutputLastSample * 2);
+//        frequencyDomain->advance();
+//        fifoOutputLastSample += stepSize;
+//    };
+//
+//    // If we have enough samples in the fifo output buffer, pass them to the audio output.
+//    if (fifoOutputLastSample - fifoOutputFirstSample >= numberOfSamples) {
+//    float *inputBuffer = fifoOutput + fifoOutputFirstSample * 2;
+//        if (isRecording) {
+//            SuperpoweredDeInterleave(inputBuffer, recordBufferFloat, recordBufferFloat,
+//                                     numberOfSamples);
+////            recorder->setSamplerate(sampleRate);
+//            recorder->process(recordBufferFloat, numberOfSamples);
+//        }
+    reverb->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
+    compressor->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
+//    nBandEQ->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
+    echo->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
+    threeBandEQ->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
 
-    // If we have enough samples in the fifo output buffer, pass them to the audio output.
-    if (fifoOutputLastSample - fifoOutputFirstSample >= numberOfSamples) {
-        inputBufferFloat = fifoOutput + fifoOutputFirstSample * 2;
-        if (isRecording) {
-            SuperpoweredDeInterleave(inputBufferFloat, recordBufferFloat, recordBufferFloat,
-                                     numberOfSamples);
-            recorder->setSamplerate(sampleRate);
-            recorder->process(recordBufferFloat, numberOfSamples);
-        }
-        reverb->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
-        compressor->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
-        nBandEQ->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
-        echo->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
-        threeBandEQ->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
-        SuperpoweredFloatToShortInt(inputBufferFloat, audioInputOutput, numberOfSamples);
-//        SuperpoweredFloatToShortInt(inputBufferFloat, audioInputOutput, numberOfSamples);
-        fifoOutputFirstSample += numberOfSamples;
-        return isPlayback;
-    } else return false;
+    SuperpoweredFloatToShortInt(inputBufferFloat, audioInputOutput, numberOfSamples);
+//        fifoOutputFirstSample += numberOfSamples;
+    return isPlayback;
 }
+
+//else {
+//return false;
+//}
+//}
 
 void __unused RecordEngine::onSampleRecordListener(short *data, int sampleSize) {
     javaVM->AttachCurrentThread(&jniEnv, NULL);
@@ -116,6 +127,8 @@ RecordEngine::RecordEngine(JNIEnv *env, jobject instance, const char *path, int 
     reverb = new SuperpoweredReverb((unsigned int) sampleRate);
     nBandEQ = new SuperpoweredNBandEQ((unsigned int) sampleRate, eqBandList);
 
+    monoMixer = new SuperpoweredMonoMixer();
+
     recorder->setSamplerate((unsigned int) sampleRate);
 
     magnitudeLeft = (float *) malloc(frequencyDomain->fftSize * sizeof(float));
@@ -129,7 +142,6 @@ RecordEngine::RecordEngine(JNIEnv *env, jobject instance, const char *path, int 
     fifoOutput = (float *) malloc(fifoCapacity * sizeof(float) * 2 + 128);
     inputBufferFloat = (float *) malloc(bufferSize * sizeof(float) * 2 + 128);
     recordBufferFloat = (float *) malloc(bufferSize * sizeof(float) * 2 + 128);
-
     SuperpoweredCPU::setSustainedPerformanceMode(true);
     audioSystem = new SuperpoweredAndroidAudioIO(sampleRate, bufferSize, true, true,
                                                  audioProcessing, this, -1,
@@ -174,22 +186,22 @@ void RecordEngine::setReverbParams(int param, float scaleValue) {
 }
 
 RecordEngine::~RecordEngine() {
+    delete audioSystem;
     delete recorder;
     delete reverb;
     delete echo;
     delete threeBandEQ;
     delete compressor;
     delete nBandEQ;
-//    delete onInitDoneMethodID;
-//    delete targetClass;
     free(recordBufferFloat);
     free(inputBufferFloat);
-//    free(samples);
     delete pathRecord;
-//    delete eqBandList;
-    delete audioSystem;
-//    delete jniEnv;
-//    delete jObject;
+    free(magnitudeLeft);
+    free(magnitudeRight);
+    free(phaseLeft);
+    free(phaseRight);
+    free(fifoOutput);
+//    delete frequencyDomain;
 }
 
 void RecordEngine::startRecord() {
@@ -243,16 +255,16 @@ void RecordEngine::onProcessBandEQ(float value0, float value1, float value2, flo
                                    float value4, float value5, float value6, float value7,
                                    float value8, float value9) {
     nBandEQ->enable(true);
-    nBandEQ->setBand(0, value0);
-    nBandEQ->setBand(1, value1);
-    nBandEQ->setBand(2, value2);
-    nBandEQ->setBand(3, value3);
-    nBandEQ->setBand(4, value4);
-    nBandEQ->setBand(5, value5);
-    nBandEQ->setBand(6, value6);
-    nBandEQ->setBand(7, value7);
-    nBandEQ->setBand(8, value8);
-    nBandEQ->setBand(9, value9);
+//    nBandEQ->setBand(0, value0);
+//    nBandEQ->setBand(1, value1);
+//    nBandEQ->setBand(2, value2);
+//    nBandEQ->setBand(3, value3);
+//    nBandEQ->setBand(4, value4);
+//    nBandEQ->setBand(5, value5);
+//    nBandEQ->setBand(6, value6);
+//    nBandEQ->setBand(7, value7);
+//    nBandEQ->setBand(8, value8);
+//    nBandEQ->setBand(9, value9);
 }
 
 void RecordEngine::enableEffect(bool enable) {
@@ -273,6 +285,10 @@ void RecordEngine::startRecordPath(const char *path) {
 
 void RecordEngine::enablePlayback(bool enable) {
     isPlayback = enable;
+}
+
+void RecordEngine::enableCompressor(bool i) {
+    compressor->enable(i);
 }
 
 
@@ -435,3 +451,10 @@ Java_vn_soft_dc_recordengine_RecorderEngine_enablePlayback(JNIEnv *env, jobject 
 
 }
 #pragma clang diagnostic pop
+
+extern "C"
+JNIEXPORT void
+Java_vn_soft_dc_recordengine_RecorderEngine_onCompressEnable(JNIEnv *env, jobject instance,
+                                                             jboolean b) {
+    executeProcess->enableCompressor(b);
+}

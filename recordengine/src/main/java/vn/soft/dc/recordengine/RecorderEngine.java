@@ -155,6 +155,8 @@ public class RecorderEngine {
 
     public native void release();
 
+    public native void onCompressEnable(boolean b);
+
     static {
         System.loadLibrary(LIB_CPP);
     }

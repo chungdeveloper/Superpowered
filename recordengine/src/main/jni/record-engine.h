@@ -1,6 +1,4 @@
-#include <stdint.h>//
-// Created by shoot on 2018-01-10.
-//
+#include <stdint.h>
 
 #ifndef FREQUENCYDOMAIN_FREQUENCYDOMAIN_H
 #define FREQUENCYDOMAIN_FREQUENCYDOMAIN_H
@@ -16,6 +14,9 @@
 #include <SuperpoweredNBandEQ.h>
 #include <jni.h>
 #include <SuperpoweredEcho.h>
+#include <SuperpoweredMixer.h>
+#include <SuperpoweredSimple.h>
+#include <SuperpoweredCPU.h>
 
 static const int REVERB_DRY = 1;
 static const int REVERB_WET = 2;
@@ -67,6 +68,8 @@ public:
 
     ~RecordEngine();
 
+    void enableCompressor(bool i);
+
 private:
     SuperpoweredReverb *reverb;
     SuperpoweredAndroidAudioIO *audioSystem;
@@ -76,6 +79,7 @@ private:
     SuperpoweredEcho *echo;
     SuperpoweredNBandEQ *nBandEQ;
     SuperpoweredFrequencyDomain *frequencyDomain;
+    SuperpoweredMonoMixer *monoMixer;
     float *magnitudeLeft, *magnitudeRight, *phaseLeft, *phaseRight, *fifoOutput, *inputBufferFloat;
     int fifoOutputFirstSample, fifoOutputLastSample, stepSize, fifoCapacity;
     bool isPlayback;

@@ -22,6 +22,13 @@
             android:textColor="@android:color/black"
             android:textSize="48sp" />
 
+        <TextView
+            android:id="@+id/tvSystemStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimary"
+            android:textSize="13sp" />
+
         <Button
             android:id="@+id/btnMedia"
             android:layout_width="wrap_content"

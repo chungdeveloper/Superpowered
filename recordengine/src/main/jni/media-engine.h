@@ -4,7 +4,6 @@
 #include <math.h>
 #include <pthread.h>
 #include <stdio.h>
-
 #include <SuperpoweredAdvancedAudioPlayer.h>
 #include <SuperpoweredFilter.h>
 #include <SuperpoweredRoll.h>

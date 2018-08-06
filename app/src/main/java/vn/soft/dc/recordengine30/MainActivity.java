@@ -1,6 +1,7 @@
 package vn.soft.dc.recordengine30;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -72,14 +73,20 @@ public class MainActivity extends AppCompatActivity {
     Button btnPlay;
     @BindView(R.id.sbVolumeMusic)
     SeekBar sbVolumeMusic;
+    @BindView(R.id.tvSystemStatus)
+    TextView tvSystemStatus;
 
     private RecorderEngine mRecorderEngine;
     private List<Preset> mPresets;
     private Gson gson;
     private boolean isEnable;
-    private int sampleRate;
     private MediaPlayer mMediaPlayer;
     private static final int MAX_VOLUME = 100;
+
+    public static void start(AppCompatActivity activity) {
+        Intent intent = new Intent(activity.getApplicationContext(), MainActivity.class);
+        activity.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        mMediaPlayer = MediaPlayer.create(this, R.raw.loi_tinh_beat);
+        mMediaPlayer = MediaPlayer.create(this, R.raw.duyen_minh_beat);
         sbVolumeMusic.setMax(MAX_VOLUME);
         sbVolumeMusic.setOnSeekBarChangeListener(onSeekBarChangeListener);
         mMediaPlayer.setVolume(0, 0);
@@ -187,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
         requestPermission(PERMISSION_CODE, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
     }
 
+    @SuppressLint("SetTextI18n")
     private void doCreate() {
         gson = new Gson();
         mPresets = new ArrayList<>();
@@ -203,13 +211,18 @@ public class MainActivity extends AppCompatActivity {
         String samplerateString = null, buffersizeString = null;
         if (Build.VERSION.SDK_INT >= 17) {
             AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-            buffersizeString = audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
-            sampleRate = Integer.parseInt(audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE));
+            if (audioManager != null) {
+                samplerateString = audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE);
+                buffersizeString = audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
+            }
         }
+        if (samplerateString == null) samplerateString = "48000";
         if (buffersizeString == null) buffersizeString = "512";
-        buffersizeString = "16";
-        Log.d("ChungLD", buffersizeString);
-        mRecorderEngine = new RecorderEngine(sampleRate, Integer.parseInt(buffersizeString), onRecordEventListener);
+        int samplerate = Integer.parseInt(samplerateString);
+        int buffersize = Integer.parseInt(buffersizeString);
+        tvSystemStatus.setText("SampleRate: " + samplerate + "; BufferSize: " + buffersize);
+
+        mRecorderEngine = new RecorderEngine(samplerate, buffersize < 32 ? buffersize : 32, onRecordEventListener);
         isEnable = false;
         btnEnable.setText(isEnable ? "Đang hoạt động" : "Đã vô hiệu hóa");
     }
