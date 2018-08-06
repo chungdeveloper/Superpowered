@@ -23,6 +23,9 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +34,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import vn.soft.dc.recordengine.RecorderEngine;
 import vn.soft.dc.recordengine.model.Preset;
+import vn.soft.dc.recordengine30.popup.PopupChoosePresetFragment;
 
 import static vn.soft.dc.recordengine.util.FileUtils.readRawTextFile;
 
@@ -75,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
     SeekBar sbVolumeMusic;
     @BindView(R.id.tvSystemStatus)
     TextView tvSystemStatus;
+    @BindView(R.id.btnEffect)
+    TextView btnEffect;
 
     private RecorderEngine mRecorderEngine;
     private List<Preset> mPresets;
@@ -119,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    @OnClick({R.id.btnPlay, R.id.btnKaraoke, R.id.btnKaraokeRoom, R.id.btnMedia, R.id.btnStart, R.id.btnStop, R.id.btnEnable, R.id.btnAcoustic, R.id.btnBolero, R.id.btnMaster, R.id.btnPopStar, R.id.btnPopStarFix, R.id.btnRap, R.id.btnStudio, R.id.btnRelease, R.id.btnInit})
+    @OnClick({R.id.btnPlay, R.id.btnBack, R.id.btnEffect, R.id.btnKaraoke, R.id.btnKaraokeRoom, R.id.btnMedia, R.id.btnStart, R.id.btnStop, R.id.btnEnable, R.id.btnAcoustic, R.id.btnBolero, R.id.btnMaster, R.id.btnPopStar, R.id.btnPopStarFix, R.id.btnRap, R.id.btnStudio, R.id.btnRelease, R.id.btnInit})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btnPlay:
@@ -144,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.btnEnable:
                 isEnable = !isEnable;
                 mRecorderEngine.enableEffectVocal(isEnable);
-                btnEnable.setText(isEnable ? "Đang hoạt động" : "Không hoạt động");
+                btnEnable.setText(isEnable ? "Mic On" : "Mic Off");
                 mRecorderEngine.enablePlayback(isEnable);
                 break;
             case R.id.btnAcoustic:
@@ -182,7 +188,56 @@ public class MainActivity extends AppCompatActivity {
             case R.id.btnKaraokeRoom:
                 mRecorderEngine.changeEffect(mPresets.get(8));
                 break;
+            case R.id.btnEffect:
+                chooseEffect();
+                break;
+            case R.id.btnBack:
+                MainActivity.this.finish();
+                break;
         }
+    }
+
+    private void chooseEffect() {
+        PopupChoosePresetFragment.newInstance().setOnPresetChoose(new PopupChoosePresetFragment.OnPresetChoose() {
+            @Override
+            public void onChoose(Preset preset) {
+                onProcessPresetChoose(new Gson().fromJson(mReadJsonData(preset.getName()), Preset.class));
+            }
+        }).show(getSupportFragmentManager(), null);
+    }
+
+    private void onProcessPresetChoose(Preset preset) {
+        String[] path = preset.getName().split("/");
+        btnEffect.setText(path[path.length - 1]);
+        mRecorderEngine.changeEffect(preset);
+    }
+
+    public String mReadJsonData(String path) {
+        try {
+            File f = new File(path);
+            FileInputStream is = new FileInputStream(f);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            return new String(buffer);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mRecorderEngine != null) {
+            mRecorderEngine.release();
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
     }
 
     private void claimPermission() {
@@ -224,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
 
         mRecorderEngine = new RecorderEngine(samplerate, buffersize < 32 ? buffersize : 32, onRecordEventListener);
         isEnable = false;
-        btnEnable.setText(isEnable ? "Đang hoạt động" : "Đã vô hiệu hóa");
+        btnEnable.setText(isEnable ? "Mic On" : "Mic Off");
     }
 
     private RecorderEngine.OnRecordEventListener onRecordEventListener = new RecorderEngine.OnRecordEventListener() {
@@ -236,6 +291,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onFrequencyListener(final double freq) {
             runOnUiThread(new Runnable() {
+                @SuppressLint("SetTextI18n")
                 @Override
                 public void run() {
                     etOffset.setText(freq + "Hz");

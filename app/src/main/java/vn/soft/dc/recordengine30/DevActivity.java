@@ -16,7 +16,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -203,8 +202,6 @@ public class DevActivity extends AppCompatActivity {
     LinearLayout lnBandEQ;
     @BindView(R.id.etName)
     EditText etName;
-    @BindView(R.id.btnSave)
-    Button btnSave;
     @BindView(R.id.damp1)
     TextView damp1;
     @BindView(R.id.predelay_value)

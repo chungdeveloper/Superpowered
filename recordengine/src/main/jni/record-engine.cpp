@@ -60,12 +60,12 @@ RecordEngine::process(short int *audioInputOutput, unsigned int numberOfSamples,
 //    // If we have enough samples in the fifo output buffer, pass them to the audio output.
 //    if (fifoOutputLastSample - fifoOutputFirstSample >= numberOfSamples) {
 //    float *inputBuffer = fifoOutput + fifoOutputFirstSample * 2;
-//        if (isRecording) {
-//            SuperpoweredDeInterleave(inputBuffer, recordBufferFloat, recordBufferFloat,
-//                                     numberOfSamples);
-////            recorder->setSamplerate(sampleRate);
-//            recorder->process(recordBufferFloat, numberOfSamples);
-//        }
+
+    if (isRecording) {
+        SuperpoweredDeInterleave(inputBufferFloat, recordBufferFloat, recordBufferFloat,
+                                 numberOfSamples);
+        recorder->process(recordBufferFloat, numberOfSamples);
+    }
 //    nBandEQ->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
     threeBandEQ->process(inputBufferFloat, inputBufferFloat, numberOfSamples);
     reverb->process(inputBufferFloat, inputBufferFloat, numberOfSamples);

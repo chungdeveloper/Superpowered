@@ -1,143 +1,222 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true"
     android:orientation="vertical"
-    android:padding="20dp"
-    android:scrollbars="none"
     tools:context=".MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/etOffset"
-            android:layout_width="match_parent"
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
             android:padding="10dp"
-            android:text="0"
-            android:textColor="@android:color/black"
-            android:textSize="48sp" />
-
-        <TextView
-            android:id="@+id/tvSystemStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:text="@string/quay_l_i"
             android:textColor="@color/colorPrimary"
-            android:textSize="13sp" />
-
-        <Button
-            android:id="@+id/btnMedia"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Media"
-            android:visibility="gone" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/volume_beat"
-            android:textColor="@color/colorPrimary"
-            android:textSize="13sp" />
-
-        <SeekBar
-            android:id="@+id/sbVolumeMusic"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp" />
-
-        <Button
-            android:id="@+id/btnPlay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Play" />
-
-        <Button
-            android:id="@+id/btnStart"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Start" />
-
-        <Button
-            android:id="@+id/btnStop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Stop" />
-
-        <Button
-            android:id="@+id/btnInit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Initialization" />
-
-        <Button
-            android:id="@+id/btnRelease"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Release" />
-
-        <Button
-            android:id="@+id/btnEnable"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Enable" />
-
-        <Button
-            android:id="@+id/btnAcoustic"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Acoustic" />
-
-        <Button
-            android:id="@+id/btnKaraoke"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Karaoke" />
-
-        <Button
-            android:id="@+id/btnKaraokeRoom"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Karaoke Room" />
-
-        <Button
-            android:id="@+id/btnBolero"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Bolero" />
-
-        <Button
-            android:id="@+id/btnMaster"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Master" />
-
-        <Button
-            android:id="@+id/btnPopStar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="PopStar" />
-
-        <Button
-            android:id="@+id/btnPopStarFix"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="PopStarFix" />
-
-        <Button
-            android:id="@+id/btnRap"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Rap" />
-
-        <Button
-            android:id="@+id/btnStudio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Studio" />
-
+            android:textSize="13sp"
+            android:textStyle="bold" />
     </LinearLayout>
-</ScrollView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/colorAccent" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="20dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/etOffset"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="0"
+                android:textColor="@android:color/black"
+                android:textSize="48sp" />
+
+            <TextView
+                android:id="@+id/tvSystemStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorPrimary"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/btnMedia"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Media"
+                android:visibility="gone" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/volume_beat"
+                android:textColor="@color/colorPrimary"
+                android:textSize="13sp" />
+
+            <SeekBar
+                android:id="@+id/sbVolumeMusic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnPlay"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Play" />
+
+                <Button
+                    android:id="@+id/btnStart"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Start" />
+
+                <Button
+                    android:id="@+id/btnStop"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Stop" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnInit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Init" />
+
+                <Button
+                    android:id="@+id/btnRelease"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Release" />
+
+                <Button
+                    android:id="@+id/btnEnable"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Enable" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/colorPrimary" />
+
+            <TextView
+                android:id="@+id/btnEffect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="Hiệu ứng"
+                android:textColor="@color/colorPrimary"
+                android:textSize="13sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginBottom="10dp"
+                android:background="@color/colorPrimary" />
+
+            <Button
+                android:id="@+id/btnAcoustic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Acoustic"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnKaraoke"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Karaoke"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnKaraokeRoom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Karaoke Room"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnBolero"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bolero"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnMaster"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Master"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnPopStar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PopStar"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnPopStarFix"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PopStarFix"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnRap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rap"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnStudio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Studio"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
