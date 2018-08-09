@@ -12,5 +12,10 @@
     <string name="turn_off_mic">Disable Microphone</string>
     <string name="quay_l_i">Back</string>
     <string name="l_u_preset">Save Preset</string>
+    <string name="echo">Echo</string>
+    <string name="dry">Dry</string>
+    <string name="reverb">Reverb</string>
+    <string name="eq_3_band">EQ 3 Band</string>
+    <string name="compressor">Compressor</string>
 
 </resources>

@@ -106,8 +106,6 @@ public class DevActivity extends AppCompatActivity {
     RelativeLayout dampContainerEcho;
     @BindView(R.id.rlEcho)
     LinearLayout rlEcho;
-    @BindView(R.id.reverbTitle)
-    TextView reverbTitle;
     @BindView(R.id.dryReverb)
     TextView dryReverb;
     @BindView(R.id.dry_value)
