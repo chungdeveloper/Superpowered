@@ -20,6 +20,8 @@ public class ChooseActivity extends AppCompatActivity {
     TextView btnSing;
     @BindView(R.id.btnSetup)
     TextView btnSetup;
+    @BindView(R.id.btnRemote)
+    TextView btnRemote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +69,7 @@ public class ChooseActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this, permissionList, codeRequest);
     }
 
-    @OnClick({R.id.btnSing, R.id.btnSetup})
+    @OnClick({R.id.btnSing, R.id.btnSetup, R.id.btnRemote})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btnSing:
@@ -75,6 +77,9 @@ public class ChooseActivity extends AppCompatActivity {
                 break;
             case R.id.btnSetup:
                 DevActivity.start(ChooseActivity.this);
+                break;
+            case R.id.btnRemote:
+                RemoteActivity.start(ChooseActivity.this);
                 break;
         }
     }

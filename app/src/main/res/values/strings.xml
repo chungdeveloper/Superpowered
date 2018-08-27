@@ -17,5 +17,13 @@
     <string name="reverb">Reverb</string>
     <string name="eq_3_band">EQ 3 Band</string>
     <string name="compressor">Compressor</string>
+    <string name="remote">Remote</string>
+    <string name="user_id_enter_hint">Nhập UserID</string>
+    <string name="y_l_logger_n">Đây là logger nè</string>
+    <string name="login">Go</string>
+    <string name="channel_id">Nhập channel ID</string>
+    <string name="connect">Go</string>
+    <string name="line_seeker">Seeker</string>
+    <string name="start">Connect to Server</string>
 
 </resources>
